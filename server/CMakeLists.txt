@@ -28,3 +28,4 @@ add_definitions(${Qt5Widgets_DEFINITIONS})
 set(CMAKE_CXX_FLAGS "${Qt5Widgets_EXECUTABLE_COMPILE_FLAGS} -Wall -std=c++11")
 
 add_subdirectory(src)
+add_subdirectory(../shared "${CMAKE_CURRENT_BINARY_DIR}/shared")

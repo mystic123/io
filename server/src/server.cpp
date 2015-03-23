@@ -1,5 +1,6 @@
 #include "server.h"
 #include "connectionthread.h"
+#include <QHostAddress>
 
 Server::Server(QObject *parent): QTcpServer(parent)
 {
@@ -26,7 +27,9 @@ void Server::startServer()
 void Server::incomingConnection(qintptr socket_desc)
 {
 	qDebug()<<socket_desc<<"Connecting...\n";
+
 	ConnectionThread *thread = new ConnectionThread(socket_desc, this);
+
 	connect(thread, SIGNAL(finished()), thread, SLOT(deleteLater()));
 
 	thread->start();

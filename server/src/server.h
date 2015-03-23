@@ -11,6 +11,7 @@ public:
 	explicit Server(QObject *parent = 0);
 	~Server();
 	void startServer();
+	void foo();
 
 protected:
 	void incomingConnection(qintptr socket_desc);

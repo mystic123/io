@@ -1,44 +1,94 @@
 #include "connectionthread.h"
+#include <QHostAddress>
 
-ConnectionThread::ConnectionThread(qintptr ID, QObject *parent) : QThread(parent), socket_desc(ID)
+const QMap<MessCodes, ConnectionThread::mem_func> ConnectionThread::_actions = {
+	{MessCodes::user_data, &ConnectionThread::userData},
+	{MessCodes::friends_list, &ConnectionThread::friendsList},
+	{MessCodes::events_list, &ConnectionThread::eventsList},
+	{MessCodes::event_data, &ConnectionThread::eventData},
+	{MessCodes::create_event, &ConnectionThread::createEvent}
+};
+
+ConnectionThread::ConnectionThread(qintptr ID, QObject *parent) : QThread(parent), _socket_desc(ID)
 {
-
 }
 
 ConnectionThread::~ConnectionThread()
 {
-
 }
 
 void ConnectionThread::run()
 {
 	qDebug()<<"Thread started\n";
 
-	socket = new QTcpSocket();
+	_socket = new QTcpSocket();
 
-	if (!socket->setSocketDescriptor(this->socket_desc)) {
-		emit error(socket->error());
+	if (!_socket->setSocketDescriptor(this->_socket_desc)) {
+		emit error(_socket->error());
 		return;
 	}
-`
-	connect(this->socket, SIGNAL(readyRead()), this, SLOT(readyRead()), Qt::DirectConnection);
-	connect(this->socket, SIGNAL(disconnected()), this, SLOT(disconnected()));
 
-	qDebug()<<socket_desc<<"Client connected\n";
+	connect(this->_socket, SIGNAL(readyRead()), this, SLOT(readyRead()), Qt::DirectConnection);
+	connect(this->_socket, SIGNAL(disconnected()), this, SLOT(disconnected()));
+
+	qDebug()<<_socket_desc<<"Client connected\n";
+
+	qDebug()<<_socket->peerName()<<" "<<_socket->peerAddress()<<" "<<_socket->peerPort()<<endl;
 
 	exec();
 }
 
 void ConnectionThread::readyRead()
 {
-	QByteArray data = socket->readAll();
+	QByteArray code = _socket->read(sizeof(MessCodes));
+	if (code.isEmpty()) {
+		qDebug()<<"error\n";
+		return;
+	}
+	qDebug()<<"code: "<<code<<endl;
+	bool ok;
+	MessCodes m_code = (MessCodes)code.toInt(&ok);
+	if (ok)
+		qDebug()<<"m_code: "<<(qint32)m_code<<endl;
+	else
+		qDebug()<<"error\n";
 
-	qDebug()<<socket_desc<<"Data in: "<<data;
-
-	socket->write(data);
+	auto it = _actions.find(m_code);
+	if (it != _actions.end()) {
+		(this->**it)();
+	}
+	else
+		qDebug()<<"error\n";
 }
 
 void ConnectionThread::disconnected()
 {
-	qDebug() << socket_desc << " Disconnected"; socket->deleteLater();				exit(0);
+	qDebug()<<_socket_desc<<"Disconnected";
+	_socket->deleteLater();
+	exit(0);
+}
+
+void ConnectionThread::userData()
+{
+	qDebug()<<"userData\n";
+}
+
+void ConnectionThread::friendsList()
+{
+	qDebug()<<"friendsList\n";
+}
+
+void ConnectionThread::eventsList()
+{
+	qDebug()<<"eventsList\n";
+}
+
+void ConnectionThread::eventData()
+{
+	qDebug()<<"eventData\n";
+}
+
+void ConnectionThread::createEvent()
+{
+	qDebug()<<"createEvent\n";
 }

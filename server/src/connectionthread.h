@@ -3,7 +3,7 @@
 
 #include <QThread>
 #include <QTcpSocket>
-#include <QDebug>
+#include "../../shared/global.h" /* fix later */
 
 class ConnectionThread : public QThread
 {
@@ -11,7 +11,7 @@ class ConnectionThread : public QThread
 
 public:
 	explicit ConnectionThread(qintptr ID, QObject *parent = 0);
-	~ConnectionThread();
+	virtual ~ConnectionThread();
 	void run();
 
 signals:
@@ -22,8 +22,18 @@ public slots:
 	void disconnected();
 
 private:
-	QTcpSocket *socket;
-	qintptr socket_desc;
+	typedef void (ConnectionThread::*mem_func)();
+	static const QMap<MessCodes, mem_func> _actions;
+	void userData();
+	void friendsList();
+	void eventsList();
+	void eventData();
+	void createEvent();
+	QTcpSocket *_socket;
+	qintptr _socket_desc;
+	/* DBController *db;*/
+
+
 };
 
 #endif // CONNECTIONTHREAD_H
