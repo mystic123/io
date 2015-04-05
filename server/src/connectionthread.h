@@ -3,7 +3,8 @@
 
 #include <QThread>
 #include <QTcpSocket>
-#include "../../shared/global.h" /* fix later */
+#include "global.h"
+#include "user.h"
 
 class ConnectionThread : public QThread
 {
@@ -31,6 +32,7 @@ private:
 	void createEvent();
 	QTcpSocket *_socket;
 	qintptr _socket_desc;
+	User* _user;
 	/* DBController *db;*/
 
 

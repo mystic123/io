@@ -9,7 +9,7 @@ const QMap<MessCodes, ConnectionThread::mem_func> ConnectionThread::_actions = {
 	{MessCodes::create_event, &ConnectionThread::createEvent}
 };
 
-ConnectionThread::ConnectionThread(qintptr ID, QObject *parent) : QThread(parent), _socket_desc(ID)
+ConnectionThread::ConnectionThread(qintptr ID, QObject *parent) : QThread(parent), _socket_desc(ID), _user(nullptr)
 {
 }
 
@@ -41,14 +41,14 @@ void ConnectionThread::run()
 void ConnectionThread::readyRead()
 {
 	QByteArray code = _socket->read(sizeof(MessCodes));
+
 	if (code.isEmpty()) {
 		qDebug()<<"error\n";
 		return;
 	}
 	qDebug()<<"code: "<<code<<endl;
-	bool ok;
-	MessCodes m_code = (MessCodes)code.toInt(&ok);
-	if (ok)
+	MessCodes m_code = toMessCode(code);
+	if (m_code != MessCodes::error_occured)
 		qDebug()<<"m_code: "<<(qint32)m_code<<endl;
 	else
 		qDebug()<<"error\n";

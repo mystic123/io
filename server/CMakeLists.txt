@@ -3,6 +3,7 @@ cmake_minimum_required (VERSION 2.8.11)
 project (BeviamoServer)
 
 set(CMAKE_PREFIX_PATH "/Users/mystic/Qt/5.4/clang_64/")
+set(CMAKE_INCLUDE_PATH "../shared")
 
 #set(CMAKE_VERBOSE_MAKEFILE 1)
 # Tell CMake to run moc when necessary:
@@ -18,8 +19,8 @@ find_package(Qt5 COMPONENTS Widgets Core Network REQUIRED)
 
 # The Qt5Widgets_INCLUDES also includes the include directories for
 # dependencies QtCore and QtGui
-include_directories(${Qt5Widgets_INCLUDES})
-
+include_directories(${Qt5Widgets_INCLUDES} ${CMAKE_SOURCE_DIR}/../shared)
+#include_directories( ${CMAKE_SOURCE_DIR}/../shared )
 # We need add -DQT_WIDGETS_LIB when using QtWidgets in Qt 5.
 add_definitions(${Qt5Widgets_DEFINITIONS})
 
@@ -28,4 +29,5 @@ add_definitions(${Qt5Widgets_DEFINITIONS})
 set(CMAKE_CXX_FLAGS "${Qt5Widgets_EXECUTABLE_COMPILE_FLAGS} -Wall -std=c++11")
 
 add_subdirectory(src)
-add_subdirectory(../shared "${CMAKE_CURRENT_BINARY_DIR}/shared")
+#add_subdirectory(../shared "${CMAKE_CURRENT_BINARY_DIR}/shared")
+add_subdirectory(${CMAKE_SOURCE_DIR}/../shared "${CMAKE_CURRENT_BINARY_DIR}/shared")
