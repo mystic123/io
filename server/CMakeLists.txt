@@ -2,7 +2,7 @@ cmake_minimum_required (VERSION 2.8.11)
 
 project (BeviamoServer)
 
-set(CMAKE_PREFIX_PATH "/Users/mystic/Qt/5.4/clang_64/")
+set(CMAKE_PREFIX_PATH "/opt/Qt/5.4/gcc/")
 set(CMAKE_INCLUDE_PATH "../shared")
 
 #set(CMAKE_VERBOSE_MAKEFILE 1)

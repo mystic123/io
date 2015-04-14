@@ -1,10 +1,12 @@
 set (SOURCES
+        dbcontroller.cpp
 	connectionthread.cpp
 	server.cpp
 	main.cpp
 )
 
 set (HEADERS
+        dbcontroller.h
 	connectionthread.h
 	server.h
 )
