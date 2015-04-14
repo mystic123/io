@@ -23,7 +23,7 @@ public:
 private:
 	uid_type _id;
 	QList<uid_type> _friends;
-
+    //nothing
 	/* forbidden */
 	User(const User&);
 
