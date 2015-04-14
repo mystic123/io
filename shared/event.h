@@ -7,15 +7,15 @@
 class Event
 {
 public:
-	explicit Event(eid_type);
+	explicit Event(id_type);
 	Event();
 //	explicit Event(QByteArray) throw(SerializationException&);
    virtual ~Event();
-	eid_type id() const { return _id; }
+	id_type id() const { return _id; }
 	QDateTime date() const { return _date; }
 	QString desc() const { return _desc; }
-	QList<uid_type> invited() const { return QList<uid_type>(_invited); }
-	QList<uid_type> attending() const { return QList<uid_type>(_attending); }
+	QList<id_type> invited() const { return QList<id_type>(_invited); }
+	QList<id_type> attending() const { return QList<id_type>(_attending); }
 
 //   operator QByteArray const();
 
@@ -23,12 +23,12 @@ public:
 	friend QDataStream& operator>>(QDataStream&, Event&);
 
 private:
-	eid_type _id;
-	uid_type _creator;
+	id_type _id;
+	id_type _creator;
    QString _desc;
    QDateTime _date;
-	QList<uid_type> _invited;
-	QList<uid_type> _attending;
+	QList<id_type> _invited;
+	QList<id_type> _attending;
    /* Location */
    /* Comments */
 

@@ -1,12 +1,12 @@
 set (SOURCES
-        dbcontroller.cpp
+	dbcontroller.cpp
 	connectionthread.cpp
 	server.cpp
 	main.cpp
 )
 
 set (HEADERS
-        dbcontroller.h
+	dbcontroller.h
 	connectionthread.h
 	server.h
 )
@@ -17,4 +17,4 @@ qt5_wrap_cpp (SOURCES ${HEADERS})
 add_executable(BeviamoServer ${SOURCES} ${RESOURCES_RCC})
 
   # The Qt5Widgets_LIBRARIES variable also includes QtGui and QtCore
-target_link_libraries(BeviamoServer ${Qt5Widgets_LIBRARIES} ${Qt5Network_LIBRARIES} SharedLib)
+target_link_libraries(BeviamoServer ${Qt5Widgets_LIBRARIES} ${Qt5Network_LIBRARIES} ${Qt5Sql_LIBRARIES} SharedLib)

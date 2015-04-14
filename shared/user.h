@@ -9,11 +9,11 @@ class User
 {
 public:
 	User();
-	explicit User(const uid_type, const QList<uid_type>&);
+	explicit User(const id_type, const QList<id_type>&);
 	//explicit User(QDataStream&) throw(SerializationException&);
    virtual ~User();
-	uid_type id() const { return _id; }
-	QList<uid_type> friends() const { return _friends; }
+	id_type id() const { return _id; }
+	QList<id_type> friends() const { return _friends; }
 
 //   operator QByteArray const();
 
@@ -21,8 +21,8 @@ public:
 	friend QDataStream& operator>>(QDataStream&, User&);
 
 private:
-	uid_type _id;
-	QList<uid_type> _friends;
+	id_type _id;
+	QList<id_type> _friends;
     //nothing
 	/* forbidden */
 	User(const User&);

@@ -2,7 +2,7 @@ cmake_minimum_required (VERSION 2.8.11)
 
 project (BeviamoServer)
 
-set(CMAKE_PREFIX_PATH "/opt/Qt/5.4/gcc/")
+set(CMAKE_PREFIX_PATH "/Users/mystic/Qt/5.4/clang_64/")
 set(CMAKE_INCLUDE_PATH "../shared")
 
 #set(CMAKE_VERBOSE_MAKEFILE 1)
@@ -15,7 +15,7 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(EXECUTABLE_OUTPUT_PATH "${CMAKE_CURRENT_BINARY_DIR}")
 
 # Widgets finds its own dependencies (QtGui and QtCore).
-find_package(Qt5 COMPONENTS Widgets Core Network REQUIRED)
+find_package(Qt5 COMPONENTS Widgets Core Network Sql REQUIRED)
 
 # The Qt5Widgets_INCLUDES also includes the include directories for
 # dependencies QtCore and QtGui

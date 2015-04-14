@@ -5,6 +5,7 @@
 #include <QTcpSocket>
 #include "global.h"
 #include "user.h"
+#include "dbcontroller.h"
 
 class ConnectionThread : public QThread
 {
@@ -14,6 +15,8 @@ public:
 	explicit ConnectionThread(qintptr ID, QObject *parent = 0);
 	virtual ~ConnectionThread();
 	void run();
+
+	static const int max_retries = 5;
 
 signals:
 	void error(QTcpSocket::SocketError socketerror);
@@ -34,7 +37,7 @@ private:
 	QTcpSocket *_socket;
 	qintptr _socket_desc;
 	User* _user;
-	/* DBController *db;*/
+	DBController *_db;
 
 
 };

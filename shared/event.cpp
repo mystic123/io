@@ -1,6 +1,6 @@
 #include "event.h"
 
-Event::Event(eid_type id): _id(id)
+Event::Event(id_type id): _id(id)
 {
 
 }

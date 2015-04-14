@@ -22,6 +22,8 @@ void Server::startServer()
 	else {
 		qDebug()<<"Listening to port: "<<port<<endl;
 	}
+
+	qDebug() << "ideal thread count:"<<QThread::idealThreadCount();
 }
 
 void Server::incomingConnection(qintptr socket_desc)

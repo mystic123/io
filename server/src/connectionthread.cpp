@@ -9,7 +9,7 @@ const QMap<MessCodes, ConnectionThread::mem_func> ConnectionThread::_actions = {
 	{MessCodes::create_event, &ConnectionThread::createEvent}
 };
 
-ConnectionThread::ConnectionThread(qintptr ID, QObject *parent) : QThread(parent), _socket_desc(ID), _user(nullptr)
+ConnectionThread::ConnectionThread(qintptr ID, QObject *parent) : QThread(parent), _socket_desc(ID), _user(nullptr), _db()
 {
 }
 
@@ -35,7 +35,30 @@ void ConnectionThread::run()
 
 	qDebug()<<_socket->peerName()<<" "<<_socket->peerAddress()<<" "<<_socket->peerPort()<<endl;
 
-	exec();
+	QDataStream st(_socket);
+
+	int retry = max_retries;
+
+	while(_socket->bytesAvailable() < sizeof(id_type) && retry > 0) {
+		_socket->waitForBytesWritten();
+		retry--;
+	}
+
+	id_type user_id;
+
+	if (_socket->bytesAvailable() >= sizeof(id_type)) {
+		st >> user_id;
+		_user = _db->getUserById(user_id);
+		if (_user) {
+			exec();
+		}
+		else {
+			qDebug() << "error: wrong user id";
+		}
+	}
+	else {
+		qDebug() << "error connected";
+	}
 }
 
 void ConnectionThread::readyRead()
@@ -72,19 +95,34 @@ void ConnectionThread::userData()
 {
 	qDebug()<<"userData\n";
 	QDataStream stream(_socket);
-	uid_type user_id;
+	id_type user_id;
 	stream >> user_id;
-	QList<uid_type> l;
-	l.push_back(74567);
-	l.push_back(24141);
-	l.push_back(1423145);
-	User u(12345, l);
-	stream << u;
+	if (user_id == _user->id()) {
+		stream << *_user;
+	}
+	else {
+		User *u = _db->getUserById(user_id);
+		stream << *u;
+		u->~User();
+		free(u);
+	}
 }
 
 void ConnectionThread::friendsList()
 {
 	qDebug()<<"friendsList\n";
+	QDataStream stream(_socket);
+	id_type user_id;
+	stream >> user_id;
+	if (user_id == _user->id()) {
+		stream << _user->friends();
+	}
+	else {
+		User *u = _db->getUserById(user_id);
+		stream << u->friends();
+		u->~User();
+		free(u);
+	}
 }
 
 void ConnectionThread::eventsList()
@@ -95,15 +133,20 @@ void ConnectionThread::eventsList()
 void ConnectionThread::eventData()
 {
 	qDebug()<<"eventData\n";
+	QDataStream stream(_socket);
+	id_type event_id;
+	stream >> event_id;
+	Event *e = _db->getEvent(event_id);
+	stream << *e;
+	e->~Event();
+	free(e);
 }
 
 void ConnectionThread::createEvent()
 {
 	qDebug()<<"createEvent\n";
 	QDataStream stream(_socket);
-	uid_type creator;
-	QString desc;
-	QDateTime date;
-	QList<uid_type> _invited;
-	stream >> creator >> desc >> date >> _invited;
+	Event e;
+	stream >> e;
+	_db->createEvent(e);
 }

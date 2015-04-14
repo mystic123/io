@@ -13,7 +13,7 @@ QDataStream& operator>>(QDataStream &in, MessCodes &m)
 	return in;
 }
 
-static MessCodes toMessCode(const QByteArray &a)
+MessCodes toMessCode(const QByteArray &a)
 {
    bool ok;
    MessCodes r = (MessCodes)a.toInt(&ok);

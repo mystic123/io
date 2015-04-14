@@ -14,14 +14,14 @@ public:
     int createUser(const User &u);
     int updateUser(const User &u);
     int removeUser(const User &u);
-    User getUserById(const uid_type);
-    User getUserByFbId(const uid_type);
+	 User* getUserById(const id_type);
+	 User* getUserByFbId(const id_type);
 
     /* Event controller */
     int createEvent(const Event &e);
     int updateEvent(const Event &e);
     int removeEvent(const Event &e);
-    Event getEvent(const eid_type);
+	 Event* getEvent(const id_type);
 
 };
 
