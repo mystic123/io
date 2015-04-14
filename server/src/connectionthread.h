@@ -30,6 +30,7 @@ private:
 	void eventsList();
 	void eventData();
 	void createEvent();
+
 	QTcpSocket *_socket;
 	qintptr _socket_desc;
 	User* _user;

@@ -71,6 +71,15 @@ void ConnectionThread::disconnected()
 void ConnectionThread::userData()
 {
 	qDebug()<<"userData\n";
+	QDataStream stream(_socket);
+	uid_type user_id;
+	stream >> user_id;
+	QList<uid_type> l;
+	l.push_back(74567);
+	l.push_back(24141);
+	l.push_back(1423145);
+	User u(12345, l);
+	stream << u;
 }
 
 void ConnectionThread::friendsList()
@@ -91,4 +100,10 @@ void ConnectionThread::eventData()
 void ConnectionThread::createEvent()
 {
 	qDebug()<<"createEvent\n";
+	QDataStream stream(_socket);
+	uid_type creator;
+	QString desc;
+	QDateTime date;
+	QList<uid_type> _invited;
+	stream >> creator >> desc >> date >> _invited;
 }

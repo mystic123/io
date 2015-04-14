@@ -6,6 +6,7 @@ set (HEADERS
 )
 
 set (SOURCES
+   global.cpp
    user.cpp
    event.cpp
    serializationexception.cpp

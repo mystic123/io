@@ -8,13 +8,17 @@
 class User
 {
 public:
-	explicit User(const uid_type);
-	explicit User(QByteArray&) throw(SerializationException&);
+	User();
+	explicit User(const uid_type, const QList<uid_type>&);
+	//explicit User(QDataStream&) throw(SerializationException&);
    virtual ~User();
 	uid_type id() const { return _id; }
 	QList<uid_type> friends() const { return _friends; }
 
-   operator QByteArray const();
+//   operator QByteArray const();
+
+	friend QDataStream& operator<<(QDataStream&, const User&);
+	friend QDataStream& operator>>(QDataStream&, User&);
 
 private:
 	uid_type _id;

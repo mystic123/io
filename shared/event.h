@@ -8,7 +8,8 @@ class Event
 {
 public:
 	explicit Event(eid_type);
-	explicit Event(QByteArray) throw(SerializationException&);
+	Event();
+//	explicit Event(QByteArray) throw(SerializationException&);
    virtual ~Event();
 	eid_type id() const { return _id; }
 	QDateTime date() const { return _date; }
@@ -16,8 +17,10 @@ public:
 	QList<uid_type> invited() const { return QList<uid_type>(_invited); }
 	QList<uid_type> attending() const { return QList<uid_type>(_attending); }
 
-   operator QByteArray const();
+//   operator QByteArray const();
 
+	friend QDataStream& operator<<(QDataStream&, const Event&);
+	friend QDataStream& operator>>(QDataStream&, Event&);
 
 private:
 	eid_type _id;

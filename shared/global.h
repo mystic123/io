@@ -4,6 +4,7 @@
 #include <QtGlobal>
 #include <QDateTime>
 #include <QDebug>
+#include <QDataStream>
 
 typedef qint32 uid_type;
 typedef qint32 eid_type;
@@ -14,17 +15,21 @@ enum class MessCodes : qint32 {
    friends_list,
    events_list,
    event_data,
-   create_event
+	create_event,
+	update_event_date,
+	update_event_desc,
+	invite_event,
+	join_event,
+	add_friend,
+	del_friend
 };
 
-static MessCodes toMessCode(const QByteArray &a)
-{
-   bool ok;
-   MessCodes r = (MessCodes)a.toInt(&ok);
-   if (ok)
-	return r;
-   return MessCodes::error_occured;
-}
+
+QDataStream& operator<<(QDataStream &out, const MessCodes &m);
+
+QDataStream& operator>>(QDataStream &in, MessCodes &m);
+
+static MessCodes toMessCode(const QByteArray &a);
 
 #endif // GLOBAL_H
 
