@@ -144,11 +144,12 @@ Event *DBController::getEvent(const id_type id)
 
 QSqlDatabase DBController::makeConnection()
 {
+	qDebug() << "makeConnection()";
     QSqlDatabase db = QSqlDatabase::addDatabase("QPSQL"); //przy wielowaltkowym tu trzeba nadac orginalna nazwe
     db.setHostName("localhost");
     db.setUserName("postgres");
-    db.setPassword("x");
-    db.setDatabaseName("mydb");
+	 db.setPassword("");
+	 db.setDatabaseName("beviamo");
     return db;
 }
 
