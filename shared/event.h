@@ -10,6 +10,7 @@ public:
 	explicit Event(id_type);
 	Event();
 //	explicit Event(QByteArray) throw(SerializationException&);
+	Event(id_type, QString, QDateTime, QList<id_type>);
    virtual ~Event();
 	id_type id() const { return _id; }
 	QDateTime date() const { return _date; }

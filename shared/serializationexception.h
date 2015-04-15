@@ -1,16 +1,22 @@
 #ifndef SERIALIZATIONEXCEPTION_H
 #define SERIALIZATIONEXCEPTION_H
 
-#include <QException>
+#include "global.h"
+#include <exception>
 
-class SerializationException : public QException
+class SerializationException : public std::exception
 {
 public:
+	SerializationException() noexcept;
 	SerializationException(const char*);
-	const char* what() const throw ();
+	SerializationException(const SerializationException&) noexcept;
+	virtual ~SerializationException();
+	SerializationException& operator= (const SerializationException&) noexcept;
+
+	virtual const char* what() const noexcept;
 
 private:
-	const char* _errMsg;
+	const char *_errMsg;
 };
 
 #endif // SERIALIZATIONEXCEPTION_H

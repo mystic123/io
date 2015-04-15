@@ -6,15 +6,23 @@ const QMap<MessCodes, ConnectionThread::mem_func> ConnectionThread::_actions = {
 	{MessCodes::friends_list, &ConnectionThread::friendsList},
 	{MessCodes::events_list, &ConnectionThread::eventsList},
 	{MessCodes::event_data, &ConnectionThread::eventData},
-	{MessCodes::create_event, &ConnectionThread::createEvent}
+	{MessCodes::create_event, &ConnectionThread::createEvent},
+	{MessCodes::update_event, &ConnectionThread::updateEvent},
+	{MessCodes::invite_event , &ConnectionThread::inviteEvent},
+	{MessCodes::join_event , &ConnectionThread::joinEvent},
+	{MessCodes::add_friend , &ConnectionThread::addFriend},
+	{MessCodes::del_friend , &ConnectionThread::delFriend}
 };
 
-ConnectionThread::ConnectionThread(qintptr ID, QObject *parent) : QThread(parent), _socket_desc(ID), _user(nullptr), _db()
+ConnectionThread::ConnectionThread(qintptr ID, QObject *parent) : QThread(parent), _socket_desc(ID), _stream(), _user(nullptr), _db()
 {
 }
 
 ConnectionThread::~ConnectionThread()
 {
+	delete _socket;
+	delete _user;
+	delete _db;
 }
 
 void ConnectionThread::run()
@@ -22,6 +30,8 @@ void ConnectionThread::run()
 	qDebug()<<"Thread started\n";
 
 	_socket = new QTcpSocket();
+
+	_stream.setDevice(_socket);
 
 	if (!_socket->setSocketDescriptor(this->_socket_desc)) {
 		emit error(_socket->error());
@@ -35,8 +45,6 @@ void ConnectionThread::run()
 
 	qDebug()<<_socket->peerName()<<" "<<_socket->peerAddress()<<" "<<_socket->peerPort()<<endl;
 
-	QDataStream st(_socket);
-
 	int retry = max_retries;
 
 	while(_socket->bytesAvailable() < sizeof(id_type) && retry > 0) {
@@ -47,12 +55,12 @@ void ConnectionThread::run()
 	id_type user_id;
 
 	if (_socket->bytesAvailable() >= sizeof(id_type)) {
-		st >> user_id;
+		_stream >> user_id;
 		_user = _db->getUserById(user_id);
 		if (_user) {
 			exec();
 		}
-		else {
+		else{
 			qDebug() << "error: wrong user id";
 		}
 	}
@@ -94,34 +102,32 @@ void ConnectionThread::disconnected()
 void ConnectionThread::userData()
 {
 	qDebug()<<"userData\n";
-	QDataStream stream(_socket);
+
 	id_type user_id;
-	stream >> user_id;
+	_stream >> user_id;
 	if (user_id == _user->id()) {
-		stream << *_user;
+		_stream << *_user;
 	}
 	else {
 		User *u = _db->getUserById(user_id);
-		stream << *u;
-		u->~User();
-		free(u);
+		_stream << *u;
+		delete u;
 	}
 }
 
 void ConnectionThread::friendsList()
 {
 	qDebug()<<"friendsList\n";
-	QDataStream stream(_socket);
+
 	id_type user_id;
-	stream >> user_id;
+	_stream >> user_id;
 	if (user_id == _user->id()) {
-		stream << _user->friends();
+		_stream << _user->friends();
 	}
 	else {
 		User *u = _db->getUserById(user_id);
-		stream << u->friends();
-		u->~User();
-		free(u);
+		_stream << u->friends();
+		delete u;
 	}
 }
 
@@ -133,20 +139,50 @@ void ConnectionThread::eventsList()
 void ConnectionThread::eventData()
 {
 	qDebug()<<"eventData\n";
-	QDataStream stream(_socket);
+
 	id_type event_id;
-	stream >> event_id;
+	_stream >> event_id;
 	Event *e = _db->getEvent(event_id);
-	stream << *e;
-	e->~Event();
-	free(e);
+	_stream << *e;
+	delete e;
 }
 
 void ConnectionThread::createEvent()
 {
 	qDebug()<<"createEvent\n";
-	QDataStream stream(_socket);
+
 	Event e;
-	stream >> e;
+	_stream >> e;
 	_db->createEvent(e);
+}
+
+void ConnectionThread::updateEvent()
+{
+	qDebug()<<"updateEvent\n";
+	Event e;
+	_stream >> e;
+	_db->updateEvent(e);
+}
+
+void ConnectionThread::inviteEvent()
+{
+	qDebug()<<"inviteEvent\n";
+	QList<id_type> list;
+	_stream >> list;
+
+}
+
+void ConnectionThread::joinEvent()
+{
+	qDebug()<<"joinEvent\n";
+}
+
+void ConnectionThread::addFriend()
+{
+	qDebug()<<"addFriend\n";
+}
+
+void ConnectionThread::delFriend()
+{
+	qDebug()<<"delFriend\n";
 }

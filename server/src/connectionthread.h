@@ -33,9 +33,15 @@ private:
 	void eventsList();
 	void eventData();
 	void createEvent();
+	void updateEvent();
+	void inviteEvent();
+	void joinEvent();
+	void addFriend();
+	void delFriend();
 
 	QTcpSocket *_socket;
 	qintptr _socket_desc;
+	QDataStream _stream;
 	User* _user;
 	DBController *_db;
 

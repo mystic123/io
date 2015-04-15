@@ -15,6 +15,11 @@ Event::Event()
 
 }
 
+Event::Event(id_type creator, QString desc, QDateTime date, QList<id_type> inv): _id(0), _creator(creator), _desc(desc), _date(date), _invited(inv)
+{
+
+}
+
 Event::~Event()
 {
 

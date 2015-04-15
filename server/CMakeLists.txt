@@ -2,8 +2,17 @@ cmake_minimum_required (VERSION 2.8.11)
 
 project (BeviamoServer)
 
-set(CMAKE_PREFIX_PATH "/Users/mystic/Qt/5.4/clang_64/")
+IF(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
+#tylko dla maca, bez tego jakies warningi sa
+   cmake_policy(SET CMP0042 NEW)
+   set(CMAKE_PREFIX_PATH "/Users/mystic/Qt/5.4/clang_64/")
+ELSE(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
+   set(CMAKE_PREFIX_PATH "/opt/Qt/5.4/gcc/")
+ENDIF(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
+
 set(CMAKE_INCLUDE_PATH "../shared")
+
+
 
 #set(CMAKE_VERBOSE_MAKEFILE 1)
 # Tell CMake to run moc when necessary:
