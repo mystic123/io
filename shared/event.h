@@ -9,11 +9,12 @@ class Event
 public:
 	explicit Event(id_type);
 	Event();
+    explicit Event(const id_type, const id_type, const QString,const QList<id_type>&, const QList<id_type>&);
 //	explicit Event(QByteArray) throw(SerializationException&);
    virtual ~Event();
 	id_type id() const { return _id; }
-	QDateTime date() const { return _date; }
 	QString desc() const { return _desc; }
+    id_type creator() const { return _creator; }
 	QList<id_type> invited() const { return QList<id_type>(_invited); }
 	QList<id_type> attending() const { return QList<id_type>(_attending); }
 
@@ -26,7 +27,6 @@ private:
 	id_type _id;
 	id_type _creator;
    QString _desc;
-   QDateTime _date;
 	QList<id_type> _invited;
 	QList<id_type> _attending;
    /* Location */
@@ -36,14 +36,5 @@ private:
 	Event(const Event&);
 
 };
-/*
- *
- * -id:int
--description: string
--time: (time_type)
--place: Location
--invited: List<User>
--attending: List<User>
--comments: List<Comments>
- */
+
 #endif // EVENT_H
