@@ -147,8 +147,8 @@ QSqlDatabase DBController::makeConnection()
 	qDebug() << "makeConnection()";
     QSqlDatabase db = QSqlDatabase::addDatabase("QPSQL"); //przy wielowaltkowym tu trzeba nadac orginalna nazwe
     db.setHostName("localhost");
-    db.setUserName("postgres");
-	 db.setPassword("");
+	 db.setUserName("beviamo");
+	 db.setPassword("beviamo");
 	 db.setDatabaseName("beviamo");
     return db;
 }
