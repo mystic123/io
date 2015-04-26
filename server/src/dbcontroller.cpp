@@ -56,7 +56,7 @@ User *DBController::getUserById(const id_type id)
         if (db.isOpen()){
             QSqlQuery query(db);
             query.prepare("SELECT friend_id FROM friends WHERE person_id=" + QVariant(id).toString() + ";");
-            query.exec();
+				query.exec();
             QList<id_type> friends;
             while (query.next())
                     friends.push_back(query.value(0).toInt());
@@ -144,8 +144,8 @@ Event *DBController::getEvent(const id_type id)
 
 QSqlDatabase DBController::makeConnection()
 {
-	qDebug() << "makeConnection()";
-    QSqlDatabase db = QSqlDatabase::addDatabase("QPSQL"); //przy wielowaltkowym tu trzeba nadac orginalna nazwe
+
+	 QSqlDatabase db = QSqlDatabase::addDatabase("QPSQL");
     db.setHostName("localhost");
 	 db.setUserName("beviamo");
 	 db.setPassword("beviamo");
@@ -191,7 +191,7 @@ void DBController::CEInside(const Event &e, QSqlDatabase db)
 {
     QSqlQuery query(db);
     query.prepare("INSERT INTO event VALUES(" + QVariant(e.id()).toString() +
-                  ", " + "'" + QVariant(e.desc()).toString() + "'"+ ", " + QVariant(e.creator()).toString()+");");
+						", " + "'" + QVariant(e.desc()).toString() + "'"+ ", " + QVariant(e.founder()).toString()+");");
     query.exec();
     QString pre("INSERT INTO invited (id_event, id_i_user, attended) VALUES ");
     QListIterator<id_type> i(e.invited());

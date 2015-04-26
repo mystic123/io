@@ -32,24 +32,15 @@ User::~User()
 {
 }
 
-//User::operator const QByteArray()
-//{
-//	QByteArray r = QByteArray::number((qint32)_id);
-//	for (id_type x : _friends) {
-//		r.append((qint32)x);
-//	}
-//	return r;
-//}
-
 QDataStream& operator<<(QDataStream &out, const User &u)
 {
-	out << u._id << u._friends;
+	out << u._id << u._friends << u._eventsAttending << u._eventsInvited;
 	return out;
 }
 
 QDataStream& operator>>(QDataStream &in, User &u)
 {
 	u = User();
-	in >> u._id >> u._friends;
+	in >> u._id >> u._friends >> u._eventsAttending >> u._eventsInvited;
 	return in;
 }

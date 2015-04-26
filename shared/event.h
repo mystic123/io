@@ -16,18 +16,18 @@ public:
 	id_type id() const { return _id; }
 	QString desc() const { return _desc; }
 	QDateTime date() const { return _date; }
-	id_type creator() const { return _creator; }
+	id_type founder() const { return _founder; }
 	QList<id_type> invited() const { return QList<id_type>(_invited); }
 	QList<id_type> attending() const { return QList<id_type>(_attending); }
 
-	//   operator QByteArray const();
 
+	/* serialization */
 	friend QDataStream& operator<<(QDataStream&, const Event&);
 	friend QDataStream& operator>>(QDataStream&, Event&);
 
 private:
 	id_type _id;
-	id_type _creator;
+	id_type _founder;
 	QString _desc;
 	QDateTime _date;
 	QList<id_type> _invited;

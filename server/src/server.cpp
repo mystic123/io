@@ -2,9 +2,8 @@
 #include "connectionthread.h"
 #include <QHostAddress>
 
-Server::Server(QObject *parent): QTcpServer(parent)
+Server::Server(QObject *parent): QTcpServer(parent)//, threads(new QThread*[Server::ThreadPool])
 {
-
 }
 
 Server::~Server()
@@ -16,6 +15,11 @@ void Server::startServer()
 {
 	int port = 2040;
 
+	/*
+	for (int i=0; i<Server::ThreadPool; i++) {
+		_threads = new ConnectionThread(i, this);
+	}
+	*/
 	if(!this->listen(QHostAddress::Any, port)) {
 		qDebug()<<"Could not start server\n";
 	}
@@ -23,7 +27,6 @@ void Server::startServer()
 		qDebug()<<"Listening to port: "<<port<<endl;
 	}
 
-	qDebug() << "ideal thread count:"<<QThread::idealThreadCount();
 }
 
 void Server::incomingConnection(qintptr socket_desc)

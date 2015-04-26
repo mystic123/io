@@ -11,10 +11,6 @@ ELSE(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
 ENDIF(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
 set(CMAKE_INCLUDE_PATH "../shared")
 
-set(SOURCES
-	client.cpp
-)
-
 #set(CMAKE_VERBOSE_MAKEFILE 1)
 # Tell CMake to run moc when necessary:
 #	set(CMAKE_AUTOMOC ON)
@@ -38,8 +34,8 @@ add_definitions(${Qt5Widgets_DEFINITIONS})
 # without -fPIE. We add that here.
 set(CMAKE_CXX_FLAGS "${Qt5Widgets_EXECUTABLE_COMPILE_FLAGS} -Wall -std=c++11")
 
+add_subdirectory(src)
+
 add_subdirectory(${CMAKE_SOURCE_DIR}/../shared "${CMAKE_SOURCE_DIR}/../shared/build")
 
-add_executable(client ${SOURCES})
-
-target_link_libraries(client ${Qt5Widgets_LIBRARIES} ${Qt5Network_LIBRARIES} SharedLib)
+#add_executable(client ${SOURCES})

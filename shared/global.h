@@ -9,6 +9,7 @@
 typedef qint32 id_type;
 
 enum class MessCodes : qint32 {
+	ok,
 	error_occured,
    user_data,
    friends_list,
@@ -19,7 +20,7 @@ enum class MessCodes : qint32 {
 	invite_event,
 	join_event,
 	add_friend,
-	del_friend
+	del_friend,
 };
 
 

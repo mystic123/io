@@ -33,12 +33,15 @@ void ConnectionThread::run()
 
 	_stream.setDevice(_socket);
 
-	_user = new User(12, QList<id_type>());
-
 	if (!_socket->setSocketDescriptor(this->_socket_desc)) {
 		emit error(_socket->error());
 		return;
 	}
+
+	_socket->waitForReadyRead();
+	id_type user_id;
+	_stream >> user_id;
+	_user = _db->getUserById(user_id);
 
 	connect(this->_socket, SIGNAL(readyRead()), this, SLOT(readyRead()), Qt::DirectConnection);
 	connect(this->_socket, SIGNAL(disconnected()), this, SLOT(disconnected()));
@@ -47,65 +50,20 @@ void ConnectionThread::run()
 
 	qDebug()<<_socket->peerName()<<" "<<_socket->peerAddress()<<" "<<_socket->peerPort()<<endl;
 
-	int retry = max_retries;
-/*
-	while(_socket->bytesAvailable() < sizeof(id_type) && retry > 0) {
-		_socket->waitForBytesWritten();
-		retry--;
-	}
-*/
-	/*
-	id_type user_id;
-	_socket->waitForBytesWritten(100000000);
-	qDebug() << "bytes:"<<_socket->bytesAvailable();
-	if (_socket->bytesAvailable() >= sizeof(id_type)) {
-		_stream >> user_id;
-		_user = _db->getUserById(user_id);
-		if (_user) {
-			exec();
-		}
-		else{
-			qDebug() << "error: wrong user id";
-		}
+	if (_user) {
+		exec();
 	}
 	else {
-		qDebug() << "error connected";
+		qDebug()<<"error: wrong user id";
 	}
-	*/
-	exec();
 }
 
 void ConnectionThread::readyRead()
 {
 	qDebug() << "readyRead";
-	//QByteArray code = _socket->read(sizeof(MessCodes));
-
-//	QByteArray code = _socket->readAll();
-
-	/*
-	Event e;
-
-	_stream >> e;
-
-	qDebug() << e.id() <<" "<< e.desc() <<" "<< e.date() <<" "<< e.invited() <<" "<< e.attending()<<endl;
-	*/
-	//qint32 code;
-	//_stream >> code;
-	//qDebug() << code;
 	MessCodes m_code;
 
-	//m_code = MessCodes::error_occured;
 	_stream >> m_code;
-
-	//qDebug() << "code:" << code.isEmpty() << code.size();
-	/*
-	if (code.isEmpty()) {
-		qDebug()<<"error\n";
-		return;
-	}*/
-
-	//qDebug()<<"code: "<<code<<endl;
-	//MessCodes m_code = toMessCode(code);
 
 	if (m_code != MessCodes::error_occured)
 		qDebug()<<"m_code: "<<(qint32)m_code;
@@ -130,9 +88,9 @@ void ConnectionThread::disconnected()
 void ConnectionThread::userData()
 {
 	qDebug()<<"userData\n";
-	while (!_socket->bytesAvailable()) {
-		_socket->waitForReadyRead();
-	}
+
+	_socket->waitForReadyRead();
+
 	id_type user_id;
 	_stream >> user_id;
 	if (user_id == _user->id()) {
@@ -149,9 +107,8 @@ void ConnectionThread::friendsList()
 {
 	qDebug()<<"friendsList\n";
 
-	while (!_socket->bytesAvailable()) {
-		_socket->waitForReadyRead();
-	}
+	_socket->waitForReadyRead();
+
 	id_type user_id;
 	_stream >> user_id;
 	if (user_id == _user->id()) {
@@ -167,15 +124,17 @@ void ConnectionThread::friendsList()
 void ConnectionThread::eventsList()
 {
 	qDebug()<<"eventsList\n";
+
+	_socket->waitForReadyRead();
+
 }
 
 void ConnectionThread::eventData()
 {
 	qDebug()<<"eventData\n";
 
-	while (!_socket->bytesAvailable()) {
-		_socket->waitForReadyRead();
-	}
+	_socket->waitForReadyRead();
+
 	id_type event_id;
 	_stream >> event_id;
 	Event *e = _db->getEvent(event_id);
@@ -187,9 +146,8 @@ void ConnectionThread::createEvent()
 {
 	qDebug()<<"createEvent\n";
 
-	while (!_socket->bytesAvailable()) {
-		_socket->waitForReadyRead();
-	}
+	_socket->waitForReadyRead();
+
 	Event e;
 	_stream >> e;
 	_db->createEvent(e);
@@ -198,9 +156,9 @@ void ConnectionThread::createEvent()
 void ConnectionThread::updateEvent()
 {
 	qDebug()<<"updateEvent\n";
-	while (!_socket->bytesAvailable()) {
-		_socket->waitForReadyRead();
-	}
+
+	_socket->waitForReadyRead();
+
 	Event e;
 	_stream >> e;
 	_db->updateEvent(e);
@@ -209,9 +167,9 @@ void ConnectionThread::updateEvent()
 void ConnectionThread::inviteEvent()
 {
 	qDebug()<<"inviteEvent\n";
-	while (!_socket->bytesAvailable()) {
-		_socket->waitForReadyRead();
-	}
+
+	_socket->waitForReadyRead();
+
 	QList<id_type> list;
 	_stream >> list;
 

@@ -12,8 +12,6 @@ ENDIF(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
 
 set(CMAKE_INCLUDE_PATH "../shared")
 
-
-
 #set(CMAKE_VERBOSE_MAKEFILE 1)
 # Tell CMake to run moc when necessary:
 #	set(CMAKE_AUTOMOC ON)

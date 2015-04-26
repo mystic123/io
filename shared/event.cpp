@@ -7,7 +7,7 @@ Event::Event(id_type id): _id(id)
 Event::Event(const id_type id1, const id_type id2, const QString q, const QList<id_type>&l1, const QList<id_type>&l2)
 {
     _id = id1;
-    _creator = id2;
+    _founder = id2;
     _desc = q;
     _invited = l1;
     _attending = l2;
@@ -23,7 +23,7 @@ Event::Event()
 
 }
 
-Event::Event(id_type creator, QString desc, QDateTime date, QList<id_type> inv): _id(0), _creator(creator), _desc(desc), _date(date), _invited(inv)
+Event::Event(id_type creator, QString desc, QDateTime date, QList<id_type> inv): _id(0), _founder(creator), _desc(desc), _date(date), _invited(inv)
 {
 
 }
@@ -33,20 +33,15 @@ Event::~Event()
 
 }
 
-//Event::operator const QByteArray()
-//{
-//	return QByteArray();
-//}
-
 QDataStream& operator<<(QDataStream& out, const Event& e)
 {
-    out << e._id << e._creator << e._desc << e._invited << e._attending;
+    out << e._id << e._founder << e._desc << e._invited << e._attending;
 	return out;
 }
 
 QDataStream& operator>>(QDataStream& in, Event&e)
 {
 	e = Event();
-    in >> e._id >> e._creator >> e._desc >> e._invited >> e._attending;
+    in >> e._id >> e._founder >> e._desc >> e._invited >> e._attending;
 	return in;
 }

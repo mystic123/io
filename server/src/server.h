@@ -2,6 +2,9 @@
 #define SERVER_H
 
 #include <QTcpServer>
+//#include <QMutex>
+
+//class ConnectionThread;
 
 class Server : public QTcpServer
 {
@@ -9,12 +12,15 @@ class Server : public QTcpServer
 
 public:
 	explicit Server(QObject *parent = 0);
-	~Server();
+	virtual ~Server();
 	void startServer();
-	void foo();
 
 protected:
 	void incomingConnection(qintptr socket_desc);
+
+private:
+	//static const int ThreadPool = 100;
+	//const ConnectionThread** _threads;
 };
 
 #endif // SERVER_H
