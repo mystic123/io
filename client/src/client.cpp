@@ -1,10 +1,10 @@
 #include "client.h"
 
-Client::Client(): _socket(new QTcpSocket), _st(_socket)
+Client::Client(): _socket(0), _st(0)
 {	
 }
 
-virtual Client::~Client()
+Client::~Client()
 {
 
 }

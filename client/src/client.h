@@ -8,7 +8,6 @@
 
 class Client
 {
-	Q_OBJECT
 
 public:
 	Client();

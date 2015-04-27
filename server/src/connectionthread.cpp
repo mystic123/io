@@ -137,12 +137,17 @@ void ConnectionThread::eventData()
 {
 	qDebug()<<"eventData\n";
 
-	_socket->waitForReadyRead();
+	//_socket->waitForReadyRead();
 
+	qDebug() <<"po wait";
 	id_type event_id;
 	_stream >> event_id;
 	Event *e = _db->getEvent(event_id);
+	qDebug() <<"po db";
 	_stream << *e;
+
+	qDebug() << "sending: " << e->id() <<e->desc();
+	_socket->flush();
 	delete e;
 }
 

@@ -11,7 +11,7 @@ int main()
 {
 	QTcpSocket *socket = new QTcpSocket();
 	QDataStream st(socket);
-	socket->connectToHost("127.0.0.1",2040);
+	socket->connectToHost("127.0.0.1", 10666);
 	socket->waitForConnected();
 
 	if (socket->state() != QTcpSocket::ConnectedState) {
@@ -79,8 +79,8 @@ int main()
 		socket->flush();
 		socket->waitForReadyRead();
 
-		User u;
-		Event e;
+		User u(0);
+		Event e(0);
 		QList<id_type> l;
 		switch(x) {
 			case 1:
