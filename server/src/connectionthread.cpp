@@ -14,7 +14,7 @@ const QMap<MessCodes, ConnectionThread::mem_func> ConnectionThread::_actions = {
 	{MessCodes::del_friend , &ConnectionThread::delFriend}
 };
 
-ConnectionThread::ConnectionThread(qintptr ID, QObject *parent) : QThread(parent), _socket_desc(ID), _stream(), _user(nullptr), _db()
+ConnectionThread::ConnectionThread(qintptr ID, QObject *parent) : QThread(parent), _socket_desc(ID), _stream(), _user(nullptr), _db(new DBController(ID))
 {
 }
 
@@ -29,6 +29,8 @@ void ConnectionThread::run()
 {
 	qDebug()<<"Thread started\n";
 
+	this->setAutoDelete(false);
+
 	_socket = new QTcpSocket();
 
 	_stream.setDevice(_socket);
@@ -41,6 +43,7 @@ void ConnectionThread::run()
 	_socket->waitForReadyRead();
 	id_type user_id;
 	_stream >> user_id;
+	qDebug() << "dostałem:" << user_id;
 	_user = _db->getUserById(user_id);
 
 	connect(this->_socket, SIGNAL(readyRead()), this, SLOT(readyRead()), Qt::DirectConnection);
@@ -51,6 +54,7 @@ void ConnectionThread::run()
 	qDebug()<<_socket->peerName()<<" "<<_socket->peerAddress()<<" "<<_socket->peerPort()<<endl;
 
 	if (_user) {
+		qDebug() << "start";
 		exec();
 	}
 	else {
@@ -81,7 +85,7 @@ void ConnectionThread::readyRead()
 void ConnectionThread::disconnected()
 {
 	qDebug()<<_socket_desc<<"Disconnected";
-	_socket->deleteLater();
+	//_socket->deleteLater();
 	exit(0);
 }
 
@@ -148,7 +152,7 @@ void ConnectionThread::createEvent()
 
 	_socket->waitForReadyRead();
 
-	Event e;
+	Event e(0);
 	_stream >> e;
 	_db->createEvent(e);
 }
@@ -159,7 +163,7 @@ void ConnectionThread::updateEvent()
 
 	_socket->waitForReadyRead();
 
-	Event e;
+	Event e(0);
 	_stream >> e;
 	_db->updateEvent(e);
 }

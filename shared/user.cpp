@@ -4,6 +4,11 @@ User::User()
 {
 }
 
+User::User(QObject *parent)
+{
+
+}
+
 User::User(const id_type id, const QList<id_type> &l): _id(id), _friends(l)
 {
 }
@@ -40,7 +45,6 @@ QDataStream& operator<<(QDataStream &out, const User &u)
 
 QDataStream& operator>>(QDataStream &in, User &u)
 {
-	u = User();
 	in >> u._id >> u._friends >> u._eventsAttending >> u._eventsInvited;
 	return in;
 }

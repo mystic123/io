@@ -3,11 +3,12 @@
 
 #include <QThread>
 #include <QTcpSocket>
+#include <QRunnable>
 #include "global.h"
 #include "user.h"
 #include "dbcontroller.h"
 
-class ConnectionThread : public QThread
+class ConnectionThread : public QThread, QRunnable
 {
 	Q_OBJECT
 

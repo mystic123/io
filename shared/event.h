@@ -4,10 +4,13 @@
 #include "global.h"
 #include "serializationexception.h"
 
-class Event
+class Event : public QObject
 {
+	Q_OBJECT
+
 public:
 	explicit Event(id_type);
+	explicit Event(QObject *parent = 0);
 	Event();
 	explicit Event(const id_type, const id_type, const QString,const QList<id_type>&, const QList<id_type>&);
 	//	explicit Event(QByteArray) throw(SerializationException&);
@@ -34,9 +37,6 @@ private:
 	QList<id_type> _attending;
 	/* Location */
 	/* Comments */
-
-	/* forbidden */
-	Event(const Event&);
 
 };
 

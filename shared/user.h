@@ -5,10 +5,13 @@
 #include "global.h"
 #include "serializationexception.h"
 
-class User
+class User : public QObject
 {
+	Q_OBJECT
+
 public:
 	User();
+	explicit User(QObject *parent =0);
 	explicit User(const id_type, const QList<id_type>&);
 	//explicit User(QDataStream&) throw(SerializationException&);
    virtual ~User();
@@ -26,10 +29,6 @@ private:
 	QList<id_type> _friends;
 	QList<id_type> _eventsAttending;
 	QList<id_type> _eventsInvited;
-
-    //nothing
-	/* forbidden */
-	User(const User&);
 
 };
 

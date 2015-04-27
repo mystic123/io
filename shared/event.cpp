@@ -4,6 +4,11 @@ Event::Event(id_type id): _id(id)
 {
 
 }
+
+Event::Event(QObject *parent)
+{
+
+}
 Event::Event(const id_type id1, const id_type id2, const QString q, const QList<id_type>&l1, const QList<id_type>&l2)
 {
     _id = id1;
@@ -41,7 +46,6 @@ QDataStream& operator<<(QDataStream& out, const Event& e)
 
 QDataStream& operator>>(QDataStream& in, Event&e)
 {
-	e = Event();
     in >> e._id >> e._founder >> e._desc >> e._invited >> e._attending;
 	return in;
 }

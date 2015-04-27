@@ -145,7 +145,8 @@ Event *DBController::getEvent(const id_type id)
 QSqlDatabase DBController::makeConnection()
 {
 
-	 QSqlDatabase db = QSqlDatabase::addDatabase("QPSQL");
+	 QSqlDatabase db = QSqlDatabase::addDatabase("QPSQL", QString::number(_id));
+	 //added unique (i hope so) id
     db.setHostName("localhost");
 	 db.setUserName("beviamo");
 	 db.setPassword("beviamo");

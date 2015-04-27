@@ -8,6 +8,8 @@
 
 class Client
 {
+	Q_OBJECT
+
 public:
 	Client();
 	virtual ~Client();

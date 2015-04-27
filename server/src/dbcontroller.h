@@ -9,6 +9,7 @@ class DBController
 {
 public:
     DBController();
+	 DBController(qintptr id): _id(id) {}
     ~DBController();
 
     /* User controller */
@@ -29,6 +30,8 @@ private:
     void RUInside(const User &u, QSqlDatabase db);
     void CEInside(const Event &e, QSqlDatabase db);
     void REInside(const Event &e, QSqlDatabase db);
+
+	 qintptr _id;
 };
 
 #endif // DBCONTROLLER_H

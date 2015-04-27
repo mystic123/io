@@ -2,25 +2,30 @@
 #include "connectionthread.h"
 #include <QHostAddress>
 
-Server::Server(QObject *parent): QTcpServer(parent)//, threads(new QThread*[Server::ThreadPool])
+Server::Server(QObject *parent): QTcpServer(parent),
+	_threadMutex(new QMutex(QMutex::Recursive)),
+	_queueMutex(new QMutex()),
+	_waitConn(new QQueue<qintptr>())
 {
+	QThreadPool::globalInstance()->setMaxThreadCount(Server::ThreadPoolSize);
 }
 
 Server::~Server()
 {
-
+	delete _threadMutex;
+	delete _queueMutex;
+	delete _waitConn;
 }
 
 void Server::startServer()
 {
-	int port = 2040;
 
 	/*
 	for (int i=0; i<Server::ThreadPool; i++) {
 		_threads = new ConnectionThread(i, this);
 	}
 	*/
-	if(!this->listen(QHostAddress::Any, port)) {
+	if(!this->listen(QHostAddress::Any, Server::port)) {
 		qDebug()<<"Could not start server\n";
 	}
 	else {
