@@ -1,15 +1,15 @@
 <RCC>
     <qresource prefix="/">
-        <file>main.qml</file>
-        <file>logIn.qml</file>
-        <file>welcome.qml</file>
+        <file>qrc/main.qml</file>
+        <file>qrc/logIn.qml</file>
+        <file>qrc/welcome.qml</file>
         <file>images/happy_people.png</file>
         <file>images/happy.png</file>
-        <file>signUp.qml</file>
+        <file>qrc/signUp.qml</file>
         <file>images/icon/96.png</file>
-        <file>eventMenu.qml</file>
-        <file>friendsMenu.qml</file>
-        <file>event.qml</file>
-        <file>createEvent.qml</file>
+        <file>qrc/eventMenu.qml</file>
+        <file>qrc/friendsMenu.qml</file>
+        <file>qrc/event.qml</file>
+        <file>qrc/createEvent.qml</file>
     </qresource>
 </RCC>

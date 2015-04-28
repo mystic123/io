@@ -12,9 +12,10 @@ set (HEADERS
 )
 
 #qt5_add_resources (RESOURCES_RCC ${RESOURCES})
-qt5_wrap_cpp (SOURCES ${HEADERS})
+#qt5_wrap_cpp (SOURCES ${HEADERS})
 	
-add_executable(BeviamoServer ${SOURCES} ${RESOURCES_RCC})
+add_executable(BeviamoServer ${SOURCES})# ${RESOURCES_RCC})
 
-  # The Qt5Widgets_LIBRARIES variable also includes QtGui and QtCore
-target_link_libraries(BeviamoServer ${Qt5Widgets_LIBRARIES} ${Qt5Network_LIBRARIES} ${Qt5Sql_LIBRARIES} SharedLib)
+qt5_use_modules(BeviamoServer Sql)
+
+target_link_libraries(BeviamoServer SharedLib)

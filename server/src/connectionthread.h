@@ -29,6 +29,7 @@ public slots:
 private:
 	typedef void (ConnectionThread::*mem_func)();
 	static const QMap<MessCodes, mem_func> _actions;
+	void login();
 	void userData();
 	void friendsList();
 	void eventsList();
@@ -45,7 +46,6 @@ private:
 	QDataStream _stream;
 	User* _user;
 	DBController *_db;
-
 
 };
 

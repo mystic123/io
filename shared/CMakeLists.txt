@@ -22,11 +22,5 @@ set (SOURCES
    serializationexception.cpp
 )
 
-set(CMAKE_INCLUDE_CURRENT_DIR ON)
-
-qt5_wrap_cpp (QOBJSS ${QOBJSH})
-
-add_library(SharedLib SHARED ${SOURCES} ${QOBJSS})
-target_link_libraries(SharedLib ${Qt5Widgets_LIBRARIES})
-
-target_include_directories (SharedLib PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+add_library(SharedLib ${SOURCES} ${QOBJSS})
+qt5_use_modules(SharedLib Network)

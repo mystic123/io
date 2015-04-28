@@ -11,6 +11,7 @@ typedef qint32 id_type;
 enum class MessCodes : qint32 {
 	ok,
 	error_occured,
+	login,
    user_data,
    friends_list,
    events_list,

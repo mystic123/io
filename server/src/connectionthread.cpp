@@ -2,6 +2,7 @@
 #include <QHostAddress>
 
 const QMap<MessCodes, ConnectionThread::mem_func> ConnectionThread::_actions = {
+	{MessCodes::login, &ConnectionThread::login},
 	{MessCodes::user_data, &ConnectionThread::userData},
 	{MessCodes::friends_list, &ConnectionThread::friendsList},
 	{MessCodes::events_list, &ConnectionThread::eventsList},
@@ -40,12 +41,6 @@ void ConnectionThread::run()
 		return;
 	}
 
-	_socket->waitForReadyRead();
-	id_type user_id;
-	_stream >> user_id;
-	qDebug() << "dostałem:" << user_id;
-	_user = _db->getUserById(user_id);
-
 	connect(this->_socket, SIGNAL(readyRead()), this, SLOT(readyRead()), Qt::DirectConnection);
 	connect(this->_socket, SIGNAL(disconnected()), this, SLOT(disconnected()));
 
@@ -53,13 +48,8 @@ void ConnectionThread::run()
 
 	qDebug()<<_socket->peerName()<<" "<<_socket->peerAddress()<<" "<<_socket->peerPort()<<endl;
 
-	if (_user) {
 		qDebug() << "start";
 		exec();
-	}
-	else {
-		qDebug()<<"error: wrong user id";
-	}
 }
 
 void ConnectionThread::readyRead()
@@ -87,6 +77,23 @@ void ConnectionThread::disconnected()
 	qDebug()<<_socket_desc<<"Disconnected";
 	//_socket->deleteLater();
 	exit(0);
+}
+
+void ConnectionThread::login()
+{
+	qDebug() << "login";
+	qDebug() << "bytes avail: " << _socket->bytesAvailable();
+	while (_socket->bytesAvailable() < sizeof(id_type)) {
+		_socket->waitForReadyRead(100);
+	}
+	id_type user_id;
+	_stream >> user_id;
+	qDebug() << "dostałem:" << user_id;
+	_user = _db->getUserById(user_id);
+	qDebug() << "user logged";
+	if (_socket->bytesAvailable() > 0) {
+		this->readyRead();
+	}
 }
 
 void ConnectionThread::userData()
@@ -137,16 +144,20 @@ void ConnectionThread::eventData()
 {
 	qDebug()<<"eventData\n";
 
-	//_socket->waitForReadyRead();
+	qDebug() << _socket->bytesAvailable();
+	while (_socket->bytesAvailable() < sizeof(id_type)) {
+		_socket->waitForReadyRead(100);
+	}
 
 	qDebug() <<"po wait";
 	id_type event_id;
 	_stream >> event_id;
 	Event *e = _db->getEvent(event_id);
+
 	qDebug() <<"po db";
 	_stream << *e;
 
-	qDebug() << "sending: " << e->id() <<e->desc();
+	qDebug() << "sending: " << e->id() <<e->desc() << sizeof(e);
 	_socket->flush();
 	delete e;
 }
