@@ -1,7 +1,7 @@
 #include <QApplication>
 #include <QQmlApplicationEngine>
 #include <QQmlContext>
-#include "cppclass.h"
+#include "client.h"
 
 int main(int argc, char *argv[])
 {
@@ -10,10 +10,11 @@ int main(int argc, char *argv[])
     QQmlApplicationEngine engine;
     engine.load(QUrl(QStringLiteral("qrc:/main.qml")));
 
-    CppClass cppClass;
+    Client c;
 
+    qDebug() << c.sendMessage().desc();
     //engine.rootContext()->setContextProperty("myModel", QVariant::fromValue(cppClass.sendMessage()));
-    engine.rootContext()->setContextProperty("myModel", cppClass.sendMessage());
+    //engine.rootContext()->setContextProperty("myModel", cppClass.sendMessage());
 
     return app.exec();
 }
