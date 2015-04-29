@@ -20,11 +20,6 @@ Server::~Server()
 void Server::startServer()
 {
 
-	/*
-	for (int i=0; i<Server::ThreadPool; i++) {
-		_threads = new ConnectionThread(i, this);
-	}
-	*/
 	if(!this->listen(QHostAddress::Any, Server::port)) {
 		qDebug()<<"Could not start server\n";
 	}

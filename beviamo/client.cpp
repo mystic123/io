@@ -12,10 +12,9 @@ Client::~Client()
 
 }
 
-Event Client::sendMessage()
+Event Client::getEventData(id_type id)
 {
 	 _socket = new QTcpSocket();
-    //_socket->connectToHost("89.72.66.74", 10666);
 	 _socket->connectToHost("127.0.0.1", 10666);
     _socket->waitForConnected();
 
@@ -38,7 +37,7 @@ _socket->waitForBytesWritten();
  qDebug() << "tu3";
 		qDebug() << e.desc() << e.id() << e.attending() << e.founder() << e.invited();
 	 qDebug() << "w f:" + e.desc() + " id: " + QString::number(e.id());
-	 return Event(0);
+	 return e;
 
 //    QStringList dataList;
 //    dataList.append("Item 1");

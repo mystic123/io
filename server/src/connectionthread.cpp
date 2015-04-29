@@ -48,7 +48,6 @@ void ConnectionThread::run()
 
 	qDebug()<<_socket->peerName()<<" "<<_socket->peerAddress()<<" "<<_socket->peerPort()<<endl;
 
-		qDebug() << "start";
 		exec();
 }
 
@@ -82,15 +81,13 @@ void ConnectionThread::disconnected()
 void ConnectionThread::login()
 {
 	qDebug() << "login";
-	qDebug() << "bytes avail: " << _socket->bytesAvailable();
 	while (_socket->bytesAvailable() < sizeof(id_type)) {
-		_socket->waitForReadyRead(100);
+		_socket->waitForReadyRead(REFRESH_TIME);
 	}
 	id_type user_id;
 	_stream >> user_id;
 	qDebug() << "dostałem:" << user_id;
 	_user = _db->getUserById(user_id);
-	qDebug() << "user logged";
 	if (_socket->bytesAvailable() > 0) {
 		this->readyRead();
 	}
@@ -100,7 +97,9 @@ void ConnectionThread::userData()
 {
 	qDebug()<<"userData\n";
 
-	_socket->waitForReadyRead();
+	while (_socket->bytesAvailable() < sizeof(id_type)) {
+		_socket->waitForReadyRead(REFRESH_TIME);
+	}
 
 	id_type user_id;
 	_stream >> user_id;
@@ -112,13 +111,19 @@ void ConnectionThread::userData()
 		_stream << *u;
 		delete u;
 	}
+	_socket->flush();
+	if (_socket->bytesAvailable() > 0) {
+		this->readyRead();
+	}
 }
 
 void ConnectionThread::friendsList()
 {
 	qDebug()<<"friendsList\n";
 
-	_socket->waitForReadyRead();
+	while (_socket->bytesAvailable() < sizeof(id_type)) {
+		_socket->waitForReadyRead(REFRESH_TIME);
+	}
 
 	id_type user_id;
 	_stream >> user_id;
@@ -128,7 +133,10 @@ void ConnectionThread::friendsList()
 	else {
 		User *u = _db->getUserById(user_id);
 		_stream << u->friends();
-		delete u;
+	}
+	_socket->flush();
+	if (_socket->bytesAvailable() > 0) {
+		this->readyRead();
 	}
 }
 
@@ -144,22 +152,20 @@ void ConnectionThread::eventData()
 {
 	qDebug()<<"eventData\n";
 
-	qDebug() << _socket->bytesAvailable();
 	while (_socket->bytesAvailable() < sizeof(id_type)) {
-		_socket->waitForReadyRead(100);
+		_socket->waitForReadyRead(REFRESH_TIME);
 	}
 
-	qDebug() <<"po wait";
 	id_type event_id;
 	_stream >> event_id;
 	Event *e = _db->getEvent(event_id);
 
-	qDebug() <<"po db";
 	_stream << *e;
-
-	qDebug() << "sending: " << e->id() <<e->desc() << sizeof(e);
 	_socket->flush();
 	delete e;
+	if (_socket->bytesAvailable() > 0) {
+		this->readyRead();
+	}
 }
 
 void ConnectionThread::createEvent()
@@ -168,7 +174,7 @@ void ConnectionThread::createEvent()
 
 	_socket->waitForReadyRead();
 
-	Event e(0);
+	Event e;
 	_stream >> e;
 	_db->createEvent(e);
 }
@@ -179,7 +185,7 @@ void ConnectionThread::updateEvent()
 
 	_socket->waitForReadyRead();
 
-	Event e(0);
+	Event e;
 	_stream >> e;
 	_db->updateEvent(e);
 }

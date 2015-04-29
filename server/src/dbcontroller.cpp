@@ -144,7 +144,6 @@ Event *DBController::getEvent(const id_type id)
 
 QSqlDatabase DBController::makeConnection()
 {
-qDebug() << "make conn start";
 	 QSqlDatabase db = QSqlDatabase::addDatabase("QPSQL", QString::number(_id));
 	 //added unique (i hope so) id
 	 db.setHostName("postgresql-mystic123.alwaysdata.net");
@@ -155,7 +154,6 @@ qDebug() << "make conn start";
 	 //db.setUserName("beviamo");
 	 //db.setPassword("beviamo");
 	 //db.setDatabaseName("beviamo");
-	 qDebug() << "make conn end";
     return db;
 }
 

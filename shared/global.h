@@ -24,12 +24,12 @@ enum class MessCodes : qint32 {
 	del_friend,
 };
 
+/* refreshing time when waiting for data */
+const qint32 REFRESH_TIME = 50;
 
 QDataStream& operator<<(QDataStream &out, const MessCodes &m);
 
 QDataStream& operator>>(QDataStream &in, MessCodes &m);
-
-MessCodes toMessCode(const QByteArray &a);
 
 #endif // GLOBAL_H
 

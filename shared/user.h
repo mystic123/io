@@ -1,28 +1,34 @@
 #ifndef USER_H
 #define USER_H
 
-#include <QList>
 #include "global.h"
-#include "serializationexception.h"
+
+class QTcpSocket;
 
 class User : public QObject
 {
 	Q_OBJECT
 
 public:
-	User();
 	explicit User(QObject *parent =0);
 	explicit User(const id_type, const QList<id_type>&);
-	//explicit User(QDataStream&) throw(SerializationException&);
+	User(const User&);
+
    virtual ~User();
 	id_type id() const { return _id; }
 	QList<id_type> friends() const { return _friends; }
 	QList<id_type> eventsAttending() const { return _eventsAttending; }
 	QList<id_type> eventsInvited() const { return _eventsInvited; }
 
+	/* opertators */
+	void operator=(const User&);
+
 	/* serialization */
 	friend QDataStream& operator<<(QDataStream&, const User&);
 	friend QDataStream& operator>>(QDataStream&, User&);
+
+	/* static functions */
+	static User readUser(QTcpSocket*);
 
 private:
 	id_type _id;

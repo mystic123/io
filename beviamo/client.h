@@ -19,16 +19,14 @@ public:
     explicit Client(QObject *parent = 0);
     ~Client();
 
-    Q_INVOKABLE Event sendMessage();
+	 Q_INVOKABLE Event getEventData(id_type);
 
 signals:
 
 public slots:
-	 void test();
 
 private:
     //QStringList<event>
-    Event e;
 	 QTcpSocket *_socket;
 	 QDataStream _st;
 };

@@ -1,8 +1,7 @@
 #include "user.h"
 
-User::User()
-{
-}
+#include <QTcpSocket>
+#include <QDataStream>
 
 User::User(QObject *parent)
 {
@@ -13,33 +12,30 @@ User::User(const id_type id, const QList<id_type> &l): _id(id), _friends(l)
 {
 }
 
-//User::User(QDataStream &stream) throw(SerializationException&): _id(0)
-//{
-//	bool ok;
-//	_id = arr.left(sizeof(id_type)).toInt(&ok);
-//	if (!ok) {
-//		throw SerializationException("wrong user id");
-//	}
-//	arr = arr.remove(0,sizeof(id_type));
-//	while(arr.size() > 0) {
-//		id_type friend_id = arr.left(sizeof(id_type)).toInt(&ok);
-//		if (!ok) {
-//			throw SerializationException("wrong friend id");
-//		}
-//		else {
-//			_friends.push_back(friend_id);
-//			arr = arr.remove(0,sizeof(id_type));
-//		}
-//	}
-//}
+User::User(const User &u): _id(u.id()), _friends(u.friends()),
+									_eventsAttending(u.eventsAttending()),
+									_eventsInvited(u.eventsInvited())
+{
+}
 
 User::~User()
 {
 }
 
+void User::operator=(const User& u)
+{
+	this->_id = u.id();
+	this->_friends = u._friends;
+	this->_eventsAttending = u.eventsAttending();
+	this->eventsInvited() = u.eventsInvited();
+}
+
 QDataStream& operator<<(QDataStream &out, const User &u)
 {
-	out << u._id << u._friends << u._eventsAttending << u._eventsInvited;
+	QByteArray array;
+	QDataStream stream(&array, QIODevice::WriteOnly);
+	stream << u._id << u._friends << u._eventsAttending << u._eventsInvited;
+	out << array;
 	return out;
 }
 
@@ -47,4 +43,22 @@ QDataStream& operator>>(QDataStream &in, User &u)
 {
 	in >> u._id >> u._friends >> u._eventsAttending >> u._eventsInvited;
 	return in;
+}
+
+User User::readUser(QTcpSocket *s)
+{
+	QDataStream d(s);
+
+	while (s->bytesAvailable() < sizeof(qint32)) {
+		s->waitForReadyRead(REFRESH_TIME);
+	}
+
+	qint32 size;
+	d >> size;
+	while (s->bytesAvailable() < size) {
+		s->waitForReadyRead(REFRESH_TIME);
+	}
+	User u;
+	d >> u;
+	return u;
 }

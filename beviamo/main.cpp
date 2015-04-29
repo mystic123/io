@@ -12,7 +12,7 @@ int main(int argc, char *argv[])
 
     Client c;
 
-    qDebug() << c.sendMessage().desc();
+	 qDebug() << c.getEventData(14).desc();
     //engine.rootContext()->setContextProperty("myModel", QVariant::fromValue(cppClass.sendMessage()));
     //engine.rootContext()->setContextProperty("myModel", cppClass.sendMessage());
 
