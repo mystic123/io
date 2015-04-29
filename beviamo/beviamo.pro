@@ -9,10 +9,10 @@ SOURCES += \
 		client.cpp \
 		../shared/event.cpp \
 		../shared/user.cpp \
-		../shared/event.cpp \
 		../shared/global.cpp
 
-HEADERS +=  client.h \
+HEADERS +=  \
+		client.h \
 		../shared/event.h \
 		../shared/user.h
 
