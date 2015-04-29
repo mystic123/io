@@ -16,7 +16,7 @@ Event Client::sendMessage()
 {
 	 _socket = new QTcpSocket();
     //_socket->connectToHost("89.72.66.74", 10666);
-	 _socket->connectToHost("127.0.0.1", 10777);
+	 _socket->connectToHost("127.0.0.1", 10666);
     _socket->waitForConnected();
 
     qDebug() << _socket->state();
@@ -34,8 +34,7 @@ _socket->waitForBytesWritten();
 	 _socket->flush();
 	 qDebug() << "t2u";
 
-	 Event e;
-	 e = Event::readEvent(_socket);
+	 Event e = Event::readEvent(_socket);
  qDebug() << "tu3";
 		qDebug() << e.desc() << e.id() << e.attending() << e.founder() << e.invited();
 	 qDebug() << "w f:" + e.desc() + " id: " + QString::number(e.id());

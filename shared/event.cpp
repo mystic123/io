@@ -57,18 +57,19 @@ Event::~Event()
 Event Event::readEvent(QTcpSocket *s)
 {
 	QDataStream d(s);
+
 	while (s->bytesAvailable() < sizeof(qint32)) {
 		s->waitForReadyRead(100);
 	}
 
-	//qint32 size;
+	qint32 size;
 	qDebug() << s->bytesAvailable();
-	//d >> size;
-	//qDebug() << "mam inta" << size;
-	/*while (s->bytesAvailable() < size) {
+	d >> size;
+	qDebug() << "mam inta" << size;
+	while (s->bytesAvailable() < size) {
 		qDebug() << s->bytesAvailable();
 		s->waitForReadyRead(100);
-	}*/
+	}
 	Event e;
 	d >> e;
 	return e;

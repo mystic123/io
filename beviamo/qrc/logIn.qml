@@ -10,7 +10,7 @@ Rectangle {
         anchors.top: parent.top
         anchors.topMargin: 0
         anchors.horizontalCenter: parent.horizontalCenter
-        source: "images/icon/96.png"
+        source: "../images/icon/96.png"
     }
 
     Rectangle {
@@ -26,7 +26,7 @@ Rectangle {
 
     TextField {
         id: username
-        placeholderText: qsTr("Username")
+        placeholderText: qsTr("qrc/Username")
         width: parent.width
         height: parent.height/13
         anchors.left: parent.left

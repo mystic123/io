@@ -8,7 +8,7 @@ Rectangle {
         anchors.top: parent.top
         anchors.topMargin: 0
         anchors.horizontalCenter: parent.horizontalCenter
-        source: "images/happy.png"
+        source: "../images/happy.png"
         fillMode: Image.Tile
     }
 

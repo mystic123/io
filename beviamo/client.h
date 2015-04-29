@@ -5,10 +5,11 @@
 #include <QQuickItem>
 #include <QQuickTextDocument>
 #include <QTextDocument>
-#include "event.h"
 #include <QTcpSocket>
 #include <QDebug>
 #include <QDataStream>
+
+#include "event.h"
 #include "global.h"
 
 class Client : public QObject

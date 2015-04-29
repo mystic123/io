@@ -3,45 +3,36 @@ import QtQuick.Controls 1.2
 import QtQuick.Controls.Styles 1.2
 
 Rectangle {
-    id: createevent
-    color: "#000000"
+    color: "#101010"
+
     Image {
         id: icon
         anchors.top: parent.top
         anchors.topMargin: 0
         anchors.horizontalCenter: parent.horizontalCenter
-        source: "images/icon/96.png"
+        source: "../images/icon/96.png"
     }
 
-
-    TextField {
-        id: what
-        placeholderText: qsTr("what?")
+    Rectangle {
+        id: gap1
         width: parent.width
         height: parent.height/13
         anchors.left: parent.left
         anchors.leftMargin: 0
         anchors.top: icon.bottom
         anchors.topMargin: 0
-        textColor: "white"
-        style: TextFieldStyle {
-            placeholderTextColor: "#A8A8A8"
-            background: Rectangle {
-                color: "#282828"
-            }
-        }
+        color: "#101010"
     }
 
-
     TextField {
-        id: where
-        placeholderText: qsTr("where?")
+        id: email
+        placeholderText: qsTr("E-mail")
         width: parent.width
         height: parent.height/13
         anchors.left: parent.left
         anchors.leftMargin: 0
-        anchors.top: what.bottom
-        anchors.topMargin: 3
+        anchors.top: gap1.bottom
+        anchors.topMargin: 0
         textColor: "white"
         style: TextFieldStyle {
             placeholderTextColor: "#A8A8A8"
@@ -52,13 +43,13 @@ Rectangle {
     }
 
     TextField {
-        id: when
-        placeholderText: qsTr("when?")
+        id: username
+        placeholderText: qsTr("Username")
         width: parent.width
         height: parent.height/13
         anchors.left: parent.left
         anchors.leftMargin: 0
-        anchors.top: where.bottom
+        anchors.top: email.bottom
         anchors.topMargin: 3
         textColor: "white"
         style: TextFieldStyle {
@@ -70,15 +61,16 @@ Rectangle {
     }
 
     TextField {
-        id: desc
-        placeholderText: qsTr("description")
+        id: password
+        placeholderText: qsTr("password")
         width: parent.width
-        height: parent.height/5
+        height: parent.height/13
         anchors.left: parent.left
         anchors.leftMargin: 0
-        anchors.top: when.bottom
+        anchors.top: username.bottom
         anchors.topMargin: 3
         textColor: "white"
+        echoMode: TextInput.Password
         style: TextFieldStyle {
             placeholderTextColor: "#A8A8A8"
             background: Rectangle {
@@ -88,12 +80,34 @@ Rectangle {
     }
 
     Rectangle {
+        id: gap2
+        width: parent.width
+        height: parent.height/13
+        anchors.left: parent.left
+        anchors.leftMargin: 0
+        anchors.top: password.bottom
+        anchors.topMargin: 0
+        color: "#101010"
+
+        Text {
+            id: error
+            font.pointSize: 13
+            font.bold: true
+            font.family: "Helvetica"
+            color: "#A80000"
+            text: qsTr("")
+            anchors.horizontalCenter: parent.horizontalCenter
+            anchors.verticalCenter: parent.verticalCenter
+        }
+    }
+
+    Rectangle {
         width: parent.width
         height: parent.height/10
         anchors.left: parent.left
         anchors.leftMargin: 0
-        anchors.bottom: createevent.bottom
-        anchors.bottomMargin: 0
+        anchors.top: gap2.bottom
+        anchors.topMargin: 0
         color: "#2f7ffa"
 
         Text {
@@ -101,7 +115,7 @@ Rectangle {
             font.bold: true
             font.family: "Helvetica"
             color: "white"
-            text: qsTr("CREATE")
+            text: qsTr("SIGN UP")
             anchors.horizontalCenter: parent.horizontalCenter
             anchors.verticalCenter: parent.verticalCenter
         }
@@ -109,11 +123,9 @@ Rectangle {
         MouseArea {
             anchors.fill: parent
             onClicked: {
+                //error.text = qsTr("test");
                 sv.push(Qt.resolvedUrl("eventMenu.qml"))
             }
         }
     }
-
-
 }
-
