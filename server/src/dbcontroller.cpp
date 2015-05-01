@@ -75,11 +75,11 @@ User *DBController::getUserById(const id_type id)
             }
 
             QSqlQuery query2(db());
-            query2.prepare("SELECT id_event FROM invited WHERE id_i_user=" + QVariant(id).toString() + ";");
+            query2.prepare("SELECT id_event, attended FROM invited WHERE id_i_user=" + QVariant(id).toString() + ";");
             query2.exec();
             while (query2.next()){
                     events.push_back(query2.value(0).toInt());
-                    if (query2.value(2).toBool())
+                    if (query2.value(1).toBool())
                         eventsAtt.push_back(query2.value(0).toInt());
             }
 
