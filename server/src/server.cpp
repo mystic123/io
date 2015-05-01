@@ -7,7 +7,6 @@ Server::Server(QObject *parent): QTcpServer(parent),
 	_queueMutex(new QMutex()),
 	_waitConn(new QQueue<qintptr>())
 {
-	QThreadPool::globalInstance()->setMaxThreadCount(Server::ThreadPoolSize);
 }
 
 Server::~Server()

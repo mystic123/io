@@ -1,11 +1,15 @@
 #include "connectionthread.h"
+
 #include <QHostAddress>
+
+#include "server.h"
 
 const QMap<MessCodes, ConnectionThread::mem_func> ConnectionThread::_actions = {
 	{MessCodes::login, &ConnectionThread::login},
 	{MessCodes::user_data, &ConnectionThread::userData},
+	//{MessCodes::short_user_data, &ConnectionThread::shortU
 	{MessCodes::friends_list, &ConnectionThread::friendsList},
-	{MessCodes::events_list, &ConnectionThread::eventsList},
+	//{MessCodes::events_list, &ConnectionThread::eventsList},
 	{MessCodes::event_data, &ConnectionThread::eventData},
 	{MessCodes::create_event, &ConnectionThread::createEvent},
 	{MessCodes::update_event, &ConnectionThread::updateEvent},
@@ -15,7 +19,7 @@ const QMap<MessCodes, ConnectionThread::mem_func> ConnectionThread::_actions = {
 	{MessCodes::del_friend , &ConnectionThread::delFriend}
 };
 
-ConnectionThread::ConnectionThread(qintptr ID, QObject *parent) : QThread(parent), _socket_desc(ID), _stream(), _user(nullptr), _db(new DBController(ID))
+ConnectionThread::ConnectionThread(qintptr ID, Server *parent) : QThread(parent), _parent(parent), _socket_desc(ID), _stream(), _user(nullptr), _db(new DBController(ID))
 {
 }
 
@@ -139,15 +143,14 @@ void ConnectionThread::friendsList()
 		this->readyRead();
 	}
 }
-
+/*
 void ConnectionThread::eventsList()
 {
 	qDebug()<<"eventsList\n";
 
 	_socket->waitForReadyRead();
-
 }
-
+*/
 void ConnectionThread::eventData()
 {
 	qDebug()<<"eventData\n";

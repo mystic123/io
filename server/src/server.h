@@ -6,7 +6,7 @@
 #include <QMutex>
 #include <QQueue>
 
-//class ConnectionThread;
+class ConnectionThread;
 
 class Server : public QTcpServer
 {
@@ -16,6 +16,9 @@ public:
 	explicit Server(QObject *parent = 0);
 	virtual ~Server();
 	void startServer();
+
+	QMutex* getThreadMutex();
+	QMutex* getQueueMutex();
 
 protected:
 	void incomingConnection(qintptr socket_desc);
@@ -27,7 +30,7 @@ private:
 	QMutex *_queueMutex;
 
 	QQueue<qintptr> *_waitConn;
-	//const ConnectionThread** _threads;
+	const ConnectionThread** _threads;
 };
 
 #endif // SERVER_H

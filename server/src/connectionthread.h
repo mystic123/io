@@ -4,16 +4,19 @@
 #include <QThread>
 #include <QTcpSocket>
 #include <QRunnable>
+
 #include "global.h"
 #include "user.h"
 #include "dbcontroller.h"
+
+class Server;
 
 class ConnectionThread : public QThread, QRunnable
 {
 	Q_OBJECT
 
 public:
-	explicit ConnectionThread(qintptr ID, QObject *parent = 0);
+	explicit ConnectionThread(qintptr ID, Server *parent = 0);
 	virtual ~ConnectionThread();
 	void run();
 
@@ -32,7 +35,7 @@ private:
 	void login();
 	void userData();
 	void friendsList();
-	void eventsList();
+	//void eventsList();
 	void eventData();
 	void createEvent();
 	void updateEvent();
@@ -41,6 +44,7 @@ private:
 	void addFriend();
 	void delFriend();
 
+	Server *_parent;
 	QTcpSocket *_socket;
 	qintptr _socket_desc;
 	QDataStream _stream;
