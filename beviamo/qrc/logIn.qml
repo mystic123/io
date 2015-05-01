@@ -26,7 +26,7 @@ Rectangle {
 
     TextField {
         id: username
-        placeholderText: qsTr("qrc/Username")
+        placeholderText: qsTr("Username")
         width: parent.width
         height: parent.height/13
         anchors.left: parent.left

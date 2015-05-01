@@ -14,7 +14,8 @@ SOURCES += \
 HEADERS +=  \
 		client.h \
 		../shared/event.h \
-		../shared/user.h
+                ../shared/user.h \
+                ../shared/global.h
 
 
 RESOURCES += qml.qrc
