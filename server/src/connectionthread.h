@@ -17,7 +17,7 @@ public:
 	virtual ~ConnectionThread();
 	void run();
 
-	static const int max_retries = 5;
+	static const int MAX_RETRY = 5;
 
 signals:
 	void error(QTcpSocket::SocketError socketerror);

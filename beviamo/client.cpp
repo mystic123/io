@@ -21,7 +21,7 @@ Event Client::getEventData(id_type id)
     qDebug() << _socket->state();
 	 _st.setDevice(_socket);
 	_st << MessCodes::login;
-	 id_type id = 12;
+	 id = 12;
 	 _st << id;
 	 _socket->flush();
 _socket->waitForBytesWritten();
@@ -38,23 +38,4 @@ _socket->waitForBytesWritten();
 		qDebug() << e.desc() << e.id() << e.attending() << e.founder() << e.invited();
 	 qDebug() << "w f:" + e.desc() + " id: " + QString::number(e.id());
 	 return e;
-
-//    QStringList dataList;
-//    dataList.append("Item 1");
-//    dataList.append("Item 2");
-//    dataList.append("Item 3");
-//    dataList.append("Item 4");
-//    dataList.append("Item 5");
-//    return dataList;
-}
-
-void Client::test()
-{
-	qDebug() << "signal" ;
-	Event e;
-	//_socket->waitForReadyRead();
-	_st >> e;
-qDebug() << "tu3";
-	  qDebug() << e.desc() << e.id();
-	qDebug() << "w f:" + e.desc() + " id: " + QString::number(e.id());
 }
