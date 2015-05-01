@@ -41,9 +41,9 @@ User::~User()
 void User::operator=(const User& u)
 {
 	this->_id = u.id();
-	this->_friends = u._friends;
+	this->_friends = u.friends();
 	this->_eventsAttending = u.eventsAttending();
-	this->eventsInvited() = u.eventsInvited();
+	this->_eventsInvited = u.eventsInvited();
 }
 
 QDataStream& operator<<(QDataStream &out, const User &u)
