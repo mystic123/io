@@ -1,21 +1,37 @@
 #include "user.h"
-
 #include <QTcpSocket>
 #include <QDataStream>
-
+#include <iostream>
 User::User(QObject *parent)
 {
 
-}
-
-User::User(const id_type id, const QList<id_type> &l): _id(id), _friends(l)
-{
 }
 
 User::User(const User &u): _id(u.id()), _friends(u.friends()),
 									_eventsAttending(u.eventsAttending()),
 									_eventsInvited(u.eventsInvited())
 {
+}
+
+User::User(const id_type id, const QList<id_type>& f, const QList<id_type>& e1, const QList<id_type>& e2)
+{
+    _id = id;
+    _friends = f;
+    _eventsInvited = e1;
+    _eventsAttending = e2;
+    std::cout << id << std::endl;
+    id_type i;
+    foreach(i, f){
+        std::cout << i << " ";
+    }
+    std::cout << std::endl;
+    foreach(i, e1){
+        std::cout << i << " ";
+    }
+    std::cout << std::endl;
+    foreach(i, e2){
+        std::cout << i << " ";
+    }
 }
 
 User::~User()

@@ -3,19 +3,27 @@
 #include <QtSql>
 #include <QList>
 
-DBController::DBController() {}
-DBController::~DBController() {}
+DBController::~DBController() {
+    db().close();
+}
+
+DBController::DBController(qintptr id){
+    QSqlDatabase db = QSqlDatabase::addDatabase("QPSQL", QString::number(id));
+    db.setHostName("postgresql-mystic123.alwaysdata.net");
+    db.setUserName("mystic123_beviamo");
+    db.setPassword("beviamo");
+    db.setDatabaseName("mystic123_beviamo");
+    this->_db = db;
+    this->_db.open();
+}
 
 int DBController::createUser(const User &u)
 {
-    QSqlDatabase db = makeConnection();
-
-    if (db.isValid()){
-        db.open();
-        if (db.isOpen()){
-            db.transaction();
-            CUInside(u, db);
-            db.commit();
+    if (db().isValid()){
+        if (db().isOpen()){
+            db().transaction();
+            CUInside(u);
+            db().commit();
         } else return -1;
     } else return -1;
     return 0;
@@ -23,14 +31,12 @@ int DBController::createUser(const User &u)
 
 int DBController::updateUser(const User &u)
 {
-    QSqlDatabase db = makeConnection();
-    if (db.isValid()){
-        db.open();
-        if (db.isOpen()){
-            db.transaction();
-            RUInside(u, db);
-            CUInside(u, db);
-            db.commit();
+    if (db().isValid()){
+        if (db().isOpen()){
+            db().transaction();
+            RUInside(u);
+            CUInside(u);
+            db().commit();
         } else return -1;
     } else return -1;
     return 0;
@@ -38,11 +44,9 @@ int DBController::updateUser(const User &u)
 
 int DBController::removeUser(const User &u)
 {
-    QSqlDatabase db = makeConnection();
-    if (db.isValid()){
-        db.open();
-        if (db.isOpen())
-            RUInside(u, db);
+    if (db().isValid()){
+        if (db().isOpen())
+            RUInside(u);
         else return -1;
     } else return -1;
     return 0;
@@ -50,17 +54,36 @@ int DBController::removeUser(const User &u)
 
 User *DBController::getUserById(const id_type id)
 {
-    QSqlDatabase db = makeConnection();
-    if (db.isValid()){
-        db.open();
-        if (db.isOpen()){
-            QSqlQuery query(db);
-            query.prepare("SELECT friend_id FROM friends WHERE person_id=" + QVariant(id).toString() + ";");
-				query.exec();
+    if (db().isValid()){
+        if (db().isOpen()){
+            QList<id_type> events;
+            QList<id_type> eventsAtt;
             QList<id_type> friends;
+            QSqlQuery query(db());
+
+            query.prepare("SELECT friend_id FROM friends WHERE person_id=" + QVariant(id).toString() + ";");
+            query.exec();
             while (query.next())
                     friends.push_back(query.value(0).toInt());
-            User *r = new User(id, friends);
+
+            QSqlQuery query1(db());
+            query1.prepare("SELECT e_id FROM event WHERE id_founder=" + QVariant(id).toString() + ";");
+            query1.exec();
+            while (query1.next()){
+                    events.push_back(query1.value(0).toInt());
+                    eventsAtt.push_back(query1.value(0).toInt());
+            }
+
+            QSqlQuery query2(db());
+            query2.prepare("SELECT id_event FROM invited WHERE id_i_user=" + QVariant(id).toString() + ";");
+            query2.exec();
+            while (query2.next()){
+                    events.push_back(query2.value(0).toInt());
+                    if (query2.value(2).toBool())
+                        eventsAtt.push_back(query2.value(0).toInt());
+            }
+
+            User *r = new User(id, friends, events, eventsAtt);
             return r;
         } else return nullptr;
     }else return nullptr;
@@ -68,14 +91,11 @@ User *DBController::getUserById(const id_type id)
 
 int DBController::createEvent(const Event &e)
 {
-    QSqlDatabase db = makeConnection();
-
-    if (db.isValid()){
-        db.open();
-        if (db.isOpen()){
-            db.transaction();
-            CEInside(e, db);
-            db.commit();
+    if (db().isValid()){
+        if (db().isOpen()){
+            db().transaction();
+            CEInside(e);
+            db().commit();
         } else return -1;
     } else return -1;
     return 0;
@@ -84,14 +104,12 @@ return 0;
 
 int DBController::updateEvent(const Event &e)
 {
-    QSqlDatabase db = makeConnection();
-    if (db.isValid()){
-        db.open();
-        if (db.isOpen()){
-            db.transaction();
-            REInside(e, db);
-            CEInside(e, db);
-            db.commit();
+    if (db().isValid()){
+        if (db().isOpen()){
+            db().transaction();
+            REInside(e);
+            CEInside(e);
+            db().commit();
         } else return -1;
     } else return -1;
     return 0;
@@ -100,11 +118,9 @@ return 0;
 
 int DBController::removeEvent(const Event &e)
 {
-    QSqlDatabase db = makeConnection();
-    if (db.isValid()){
-        db.open();
-        if (db.isOpen())
-            REInside(e, db);
+    if (db().isValid()){
+        if (db().isOpen())
+            REInside(e);
         else return -1;
     } else return -1;
     return 0;
@@ -113,11 +129,9 @@ return 0;
 
 Event *DBController::getEvent(const id_type id)
 {
-    QSqlDatabase db = makeConnection();
-    if (db.isValid()){
-        db.open();
-        if (db.isOpen()){
-            QSqlQuery query(db);
+    if (db().isValid()){
+        if (db().isOpen()){
+            QSqlQuery query(db());
             query.prepare("SELECT descript, id_founder FROM event WHERE e_id=" + QVariant(id).toString() + ";");
             query.exec();
             id_type _creator;
@@ -141,25 +155,9 @@ Event *DBController::getEvent(const id_type id)
 }
 
 /* private */
-
-QSqlDatabase DBController::makeConnection()
+void DBController::CUInside(const User &u)
 {
-	 QSqlDatabase db = QSqlDatabase::addDatabase("QPSQL", QString::number(_id));
-	 //added unique (i hope so) id
-	 db.setHostName("postgresql-mystic123.alwaysdata.net");
-	 db.setUserName("mystic123_beviamo");
-	 db.setPassword("beviamo");
-	 db.setDatabaseName("mystic123_beviamo");
-	 //db.setHostName("localhost");
-	 //db.setUserName("beviamo");
-	 //db.setPassword("beviamo");
-	 //db.setDatabaseName("beviamo");
-    return db;
-}
-
-void DBController::CUInside(const User &u, QSqlDatabase db)
-{
-    QSqlQuery query(db);
+    QSqlQuery query(db());
     query.prepare("INSERT INTO users VALUES(" + QVariant(u.id()).toString() + ");");
     query.exec();
     QString pre("INSERT INTO friends (person_id,friend_id) VALUES ");
@@ -184,16 +182,16 @@ void DBController::CUInside(const User &u, QSqlDatabase db)
     if(query.isActive()) query.clear();
 }
 
-void DBController::RUInside(const User &u, QSqlDatabase db)
+void DBController::RUInside(const User &u)
 {
-    QSqlQuery query(db);
+    QSqlQuery query(db());
     query.prepare("DELETE FROM users WHERE u_id=" + QVariant(u.id()).toString() + ";");
     query.exec();
 }
 
-void DBController::CEInside(const Event &e, QSqlDatabase db)
+void DBController::CEInside(const Event &e)
 {
-    QSqlQuery query(db);
+    QSqlQuery query(db());
     query.prepare("INSERT INTO event VALUES(" + QVariant(e.id()).toString() +
 						", " + "'" + QVariant(e.desc()).toString() + "'"+ ", " + QVariant(e.founder()).toString()+");");
     query.exec();
@@ -222,9 +220,9 @@ void DBController::CEInside(const Event &e, QSqlDatabase db)
     if(query.isActive()) query.clear();
 }
 
-void DBController::REInside(const Event &e, QSqlDatabase db)
+void DBController::REInside(const Event &e)
 {
-    QSqlQuery query(db);
+    QSqlQuery query(db());
     query.prepare("DELETE FROM event WHERE e_id=" + QVariant(e.id()).toString() + ";");
     query.exec();
 }

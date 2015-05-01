@@ -81,7 +81,7 @@ Rectangle {
                     height: infowhat.height + infowhere.height
                     Text {
                         id: infowhat
-                        text: name + ", by " + who
+                        text: desc
                         anchors.horizontalCenter: parent.horizontalCenter
                         font.pointSize: 14
                         font.bold: true
@@ -91,7 +91,8 @@ Rectangle {
 
                     Text {
                         id: infowhere
-                        text: where + ", " + when
+                        //text: where + ", " + when
+                        text: "DUPADUPA"
                         anchors.horizontalCenter: parent.horizontalCenter
                         anchors.top: infowhat.bottom
                         anchors.topMargin: 0
@@ -104,6 +105,7 @@ Rectangle {
                     MouseArea {
                         anchors.fill: parent
                         onClicked: {
+
                             sv.push(Qt.resolvedUrl("event.qml"))
                         }
                     }
@@ -135,7 +137,7 @@ Rectangle {
         height: parent.height - ce.height
         anchors.top: ce.bottom
         anchors.topMargin: 3
-        model: listModel
+        model: myModel
         delegate: listDelegate
     }
 }
