@@ -2,12 +2,16 @@
 #define EVENT_H
 
 #include "global.h"
+#include <QObject>
+#include <QMetaType>
 
 class QTcpSocket;
 
 class Event : public QObject
 {
-	Q_OBJECT
+    Q_OBJECT
+    Q_PROPERTY(QString desc READ desc)
+    Q_PROPERTY(QString event_id READ id)
 
 public:
 	explicit Event(QObject *parent = 0);
@@ -42,7 +46,7 @@ private:
 	QList<id_type> _attending;
 	/* Location */
 	/* Comments */
-
 };
 
+Q_DECLARE_METATYPE(Event)
 #endif // EVENT_H

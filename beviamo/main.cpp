@@ -1,7 +1,10 @@
 #include <QApplication>
 #include <QQmlApplicationEngine>
 #include <QQmlContext>
+#include <QVariant>
+#include <QString>
 #include "client.h"
+#include "event.h"
 
 int main(int argc, char *argv[])
 {
@@ -11,10 +14,10 @@ int main(int argc, char *argv[])
     engine.load(QUrl(QStringLiteral("qrc:/qrc/main.qml")));
 
     Client c;
+    c.setEngine(&engine);
+    c.login();
 
-	 qDebug() << c.getEventData(14).desc();
-    //engine.rootContext()->setContextProperty("myModel", QVariant::fromValue(cppClass.sendMessage()));
-    //engine.rootContext()->setContextProperty("myModel", cppClass.sendMessage());
+    //qmlRegisterType<Event>("Bev", 1, 0, "Event");
 
     return app.exec();
 }
