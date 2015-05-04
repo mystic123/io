@@ -2,18 +2,12 @@
 #include "connectionthread.h"
 #include <QHostAddress>
 
-Server::Server(QObject *parent): QTcpServer(parent),
-	_threadMutex(new QMutex(QMutex::Recursive)),
-	_queueMutex(new QMutex()),
-	_waitConn(new QQueue<qintptr>())
+Server::Server(QObject *parent): QTcpServer(parent)
 {
 }
 
 Server::~Server()
 {
-	delete _threadMutex;
-	delete _queueMutex;
-	delete _waitConn;
 }
 
 void Server::startServer()
@@ -36,5 +30,6 @@ void Server::incomingConnection(qintptr socket_desc)
 
 	connect(thread, SIGNAL(finished()), thread, SLOT(deleteLater()));
 
-	thread->start();
+	QThreadPool::globalInstance()->start(thread);
+//	thread->start();
 }

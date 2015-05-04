@@ -1,6 +1,9 @@
 #ifndef USER_H
 #define USER_H
 
+#include <QList>
+#include <QChar>
+
 #include "global.h"
 
 class QTcpSocket;
@@ -10,15 +13,35 @@ class User : public QObject
 	Q_OBJECT
 
 public:
+	/* constructors */
 	explicit User(QObject *parent =0);
-    explicit User(const id_type, const QList<id_type>&, const QList<id_type>&, const QList<id_type>&);
+	explicit User(const id_type, const QList<id_type>&, const QList<id_type>&, const QList<id_type>&);
 	User(const User&);
 
    virtual ~User();
-	id_type id() const { return _id; }
-	QList<id_type> friends() const { return _friends; }
-    QList<id_type> eventsAttending() const { return _eventsAttending; }
-	QList<id_type> eventsInvited() const { return _eventsInvited; }
+
+	/* getters */
+	id_type id() const;
+	id_type fbId() const;
+	QString email() const;
+	QString firstName() const;
+	QString lastName() const;
+	QString name() const;
+	QChar gender() const;
+	QList<id_type> friends() const;
+	QList<id_type> eventsAttending() const;
+	QList<id_type> eventsInvited() const;
+
+	/* setters */
+	void setId(const id_type &id);
+	void setFbId(const id_type &fbId);
+	void setEmail(const QString &email);
+	void setFirstName(const QString &firstName);
+	void setLastName(const QString &lastName);
+	void setGender(const QChar &gender);
+	void setFriends(const QList<id_type> &friends);
+	void setEventsAttending(const QList<id_type> &eventsAttending);
+	void setEventsInvited(const QList<id_type> &eventsInvited);
 
 	/* opertators */
 	void operator=(const User&);
@@ -32,6 +55,11 @@ public:
 
 private:
 	id_type _id;
+	id_type _fbId;
+	QString _email;
+	QString _firstName;
+	QString _lastName;
+	QChar _gender;
 	QList<id_type> _friends;
 	QList<id_type> _eventsAttending;
 	QList<id_type> _eventsInvited;

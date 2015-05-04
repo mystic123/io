@@ -8,7 +8,7 @@
 class DBController
 {
 public:
-    DBController(){};
+	 DBController(){}
     DBController(qintptr id);
     ~DBController();
 

@@ -6,7 +6,7 @@
 #include <QDebug>
 #include <QDataStream>
 
-typedef qint32 id_type;
+typedef qint64 id_type;
 
 enum class MessCodes : qint32 {
 	ok,
@@ -22,10 +22,11 @@ enum class MessCodes : qint32 {
 	join_event,
 	add_friend,
 	del_friend,
+	fetchFacebook
 };
 
 /* refreshing time when waiting for data */
-const qint32 REFRESH_TIME = 50;
+const qint32 REFRESH_TIME = 30;
 
 QDataStream& operator<<(QDataStream &out, const MessCodes &m);
 

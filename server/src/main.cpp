@@ -1,6 +1,7 @@
 #include <QCoreApplication>
 #include <iostream>
 #include "server.h"
+#include "fbsync.h"
 
 using namespace std;
 

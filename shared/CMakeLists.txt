@@ -2,25 +2,15 @@ set (HEADERS
    global.h
    user.h
    event.h
-   serializationexception.h
-)
-
-set (QOBJSH
-   user.h
-   event.h
-)
-
-set (QOBJSS
-   user.cpp
-   event.cpp
+   fbsync.h
 )
 
 set (SOURCES
    global.cpp
    user.cpp
    event.cpp
-   serializationexception.cpp
+   fbsync.cpp
 )
 
-add_library(SharedLib ${SOURCES} ${QOBJSS})
+add_library(SharedLib ${SOURCES})
 qt5_use_modules(SharedLib Network)

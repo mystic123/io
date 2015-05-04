@@ -11,12 +11,12 @@
 
 class Server;
 
-class ConnectionThread : public QThread, QRunnable
+class ConnectionThread : public QThread, public QRunnable
 {
 	Q_OBJECT
 
 public:
-	explicit ConnectionThread(qintptr ID, Server *parent = 0);
+	explicit ConnectionThread(qintptr ID, QObject *parent = 0);
 	virtual ~ConnectionThread();
 	void run();
 
@@ -35,7 +35,6 @@ private:
 	void login();
 	void userData();
 	void friendsList();
-	//void eventsList();
 	void eventData();
 	void createEvent();
 	void updateEvent();
@@ -43,8 +42,8 @@ private:
 	void joinEvent();
 	void addFriend();
 	void delFriend();
+	void fetchFacebook();
 
-	Server *_parent;
 	QTcpSocket *_socket;
 	qintptr _socket_desc;
 	QDataStream _stream;
