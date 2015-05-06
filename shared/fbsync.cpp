@@ -23,11 +23,17 @@ void FBsync::fetchData()
 {
 	fetchUserData();
 	fetchFriends();
+	emit userDataReady();
 }
 
 void FBsync::setToken(const QString &token)
 {
 	_token = token;
+}
+
+User *FBsync::getUser() const
+{
+	return _user;
 }
 
 void FBsync::fetchUserData()
@@ -59,17 +65,17 @@ void FBsync::fetchUserDataS(QNetworkReply *reply)
 	QString str = reply->readAll();
 	QJsonDocument jsonResponse = QJsonDocument::fromJson(str.toUtf8());
 	QJsonObject obj = jsonResponse.object();
-	User u;
-	u.setFbId(obj.find("id").value().toString().toLongLong());
-	qDebug() << "fbid:" << u.fbId();
-	u.setEmail(obj.find("email").value().toString());
-	qDebug() << "email:" << u.email();
-	u.setFirstName(obj.find("first_name").value().toString());
-	qDebug() << "first name:" << u.firstName();
-	u.setLastName(obj.find("last_name").value().toString());
-	qDebug() << "last name:" << u.lastName();
-	u.setGender(obj.find("gender").value().toString().at(0));
-	qDebug() << "gender:" << u.gender();
+	_user = new User();
+	_user->setFbId(obj.find("id").value().toString().toLongLong());
+	qDebug() << "fbid:" << _user->fbId();
+	_user->setEmail(obj.find("email").value().toString());
+	qDebug() << "email:" << _user->email();
+	_user->setFirstName(obj.find("first_name").value().toString());
+	qDebug() << "first name:" << _user->firstName();
+	_user->setLastName(obj.find("last_name").value().toString());
+	qDebug() << "last name:" << _user->lastName();
+	_user->setGender(obj.find("gender").value().toString().at(0));
+	qDebug() << "gender:" << _user->gender();
 }
 
 void FBsync::fetchFriendsS(QNetworkReply *reply)
@@ -80,6 +86,8 @@ void FBsync::fetchFriendsS(QNetworkReply *reply)
 	qDebug() << arr;
 	for (QJsonValue x : arr) {
 		qDebug() << x.toObject().value("id");
+		_user->addFriend(x.toObject().value("id").toString().toULongLong());
+		qDebug() << "added:" << x.toObject().value("id").toString().toULongLong();
 	}
 }
 

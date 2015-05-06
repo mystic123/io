@@ -42,7 +42,7 @@ private:
 	void joinEvent();
 	void addFriend();
 	void delFriend();
-	void fetchFacebook();
+	void signup();
 
 	QTcpSocket *_socket;
 	qintptr _socket_desc;

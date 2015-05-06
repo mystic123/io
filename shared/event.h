@@ -20,12 +20,24 @@ public:
 
 	Event(id_type, QString, QDateTime, QList<id_type>);
 	virtual ~Event();
-	id_type id() const { return _id; }
-	QString desc() const { return _desc; }
-	QDateTime date() const { return _date; }
-	id_type founder() const { return _founder; }
-	QList<id_type> invited() const { return QList<id_type>(_invited); }
-	QList<id_type> attending() const { return QList<id_type>(_attending); }
+
+	/* getters */
+	id_type id() const;
+	id_type founder() const;
+	QString title() const;
+	QString desc() const;
+	QDateTime date() const;
+	QList<id_type> invited() const;
+	QList<id_type> attending() const;
+
+	/* setters */
+	void setId(const id_type &id);
+	void setFounder(const id_type &founder);
+	void setTitle(const QString &title);
+	void setDesc(const QString &desc);
+	void setDate(const QDateTime &date);
+	void setInvited(const QList<id_type> &invited);
+	void setAttending(const QList<id_type> &attending);
 
 	/* opertators */
 	void operator=(const Event&);
@@ -40,6 +52,7 @@ public:
 private:
 	id_type _id;
 	id_type _founder;
+	QString _title;
 	QString _desc;
 	QDateTime _date;
 	QList<id_type> _invited;

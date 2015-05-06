@@ -18,7 +18,10 @@ public:
 	void fetchData();
 	void setToken(const QString& token);
 
+	User* getUser() const;
+
 signals:
+	void userDataReady();
 
 private slots:
 	void fetchUserDataS(QNetworkReply*);
@@ -31,6 +34,7 @@ private:
 	static const QString APP_ID;
 	static const QString APP_SECRET;
 	QString _token;
+	User *_user;
 
 };
 

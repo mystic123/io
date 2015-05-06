@@ -12,6 +12,7 @@ enum class MessCodes : qint32 {
 	ok,
 	error_occured,
 	login,
+	signup,
    user_data,
    friends_list,
    events_list,
@@ -22,7 +23,6 @@ enum class MessCodes : qint32 {
 	join_event,
 	add_friend,
 	del_friend,
-	fetchFacebook
 };
 
 /* refreshing time when waiting for data */

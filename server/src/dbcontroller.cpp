@@ -9,10 +9,14 @@ DBController::~DBController() {
 
 DBController::DBController(qintptr id){
     QSqlDatabase db = QSqlDatabase::addDatabase("QPSQL", QString::number(id));
-    db.setHostName("postgresql-mystic123.alwaysdata.net");
-    db.setUserName("mystic123_beviamo");
-    db.setPassword("beviamo");
-    db.setDatabaseName("mystic123_beviamo");
+//    db.setHostName("postgresql-mystic123.alwaysdata.net");
+//    db.setUserName("mystic123_beviamo");
+//    db.setPassword("beviamo");
+//    db.setDatabaseName("mystic123_beviamo");
+	 db.setHostName("localhost");
+	 db.setUserName("beviamo");
+	 db.setPassword("beviamo");
+	 db.setDatabaseName("beviamo");
     this->_db = db;
     this->_db.open();
 }
@@ -191,8 +195,9 @@ void DBController::RUInside(const User &u)
 
 void DBController::CEInside(const Event &e)
 {
+	qsrand(time(nullptr));
     QSqlQuery query(db());
-    query.prepare("INSERT INTO event VALUES(" + QVariant(e.id()).toString() +
+	 query.prepare("INSERT INTO event VALUES(" + QVariant(900+qrand()%1000).toString() +
 						", " + "'" + QVariant(e.desc()).toString() + "'"+ ", " + QVariant(e.founder()).toString()+");");
     query.exec();
     QString pre("INSERT INTO invited (id_event, id_i_user, attended) VALUES ");

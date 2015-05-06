@@ -142,6 +142,16 @@ void User::setEventsInvited(const QList<id_type> &eventsInvited)
 	_eventsInvited = eventsInvited;
 }
 
+void User::addFriend(id_type id)
+{
+	_friends.append(id);
+}
+
+void User::addFrriend(const QList<id_type>& l)
+{
+	_friends.append(l);
+}
+
 void User::operator=(const User& u)
 {
 	this->_id = u.id();

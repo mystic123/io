@@ -1,12 +1,14 @@
 #include "connectionthread.h"
 
 #include <QHostAddress>
+#include <QEventLoop>
 
 #include "server.h"
 #include "fbsync.h"
 
 const QMap<MessCodes, ConnectionThread::mem_func> ConnectionThread::_actions = {
 	{MessCodes::login, &ConnectionThread::login},
+	{MessCodes::signup, &ConnectionThread::signup},
 	{MessCodes::user_data, &ConnectionThread::userData},
 	{MessCodes::friends_list, &ConnectionThread::friendsList},
 	{MessCodes::event_data, &ConnectionThread::eventData},
@@ -16,7 +18,6 @@ const QMap<MessCodes, ConnectionThread::mem_func> ConnectionThread::_actions = {
 	{MessCodes::join_event, &ConnectionThread::joinEvent},
 	{MessCodes::add_friend, &ConnectionThread::addFriend},
 	{MessCodes::del_friend, &ConnectionThread::delFriend},
-	{MessCodes::fetchFacebook, &ConnectionThread::fetchFacebook}
 };
 
 ConnectionThread::ConnectionThread(qintptr ID, QObject *parent) : QThread(parent), _socket_desc(ID), _stream(), _user(nullptr), _db(new DBController(ID))
@@ -109,9 +110,11 @@ void ConnectionThread::userData()
 	_stream >> user_id;
 	if (user_id == _user->id()) {
 		_stream << *_user;
+		qDebug() << _user->eventsAttending() << _user->eventsInvited();
 	}
 	else {
 		User *u = _db->getUserById(user_id);
+		qDebug() << "tu" << u->eventsAttending() << u->eventsInvited();
 		_stream << *u;
 		delete u;
 	}
@@ -169,8 +172,11 @@ void ConnectionThread::createEvent()
 	qDebug()<<"createEvent";
 
 	Event e = Event::readEvent(_socket);
-	//qDebug() << e.desc();
 	_db->createEvent(e);
+	this->_user = _db->getUserById(_user->id());
+	qDebug() << _user->eventsAttending() << _user->eventsInvited();
+	_stream << MessCodes::ok;
+	_socket->flush();
 }
 
 void ConnectionThread::updateEvent()
@@ -208,6 +214,43 @@ void ConnectionThread::delFriend()
 	qDebug()<<"delFriend";
 }
 
+void ConnectionThread::signup()
+{
+	qDebug()<<"signup";
+
+	while (_socket->bytesAvailable() < sizeof(qint32)) {
+		_socket->waitForReadyRead(REFRESH_TIME);
+	}
+
+	qint32 size;
+	_stream >> size;
+
+	while (_socket->bytesAvailable() < size) {
+		_socket->waitForReadyRead(REFRESH_TIME);
+	}
+
+	QString token;
+	_stream >> token;
+
+	FBsync fb;
+	fb.setToken(token);
+
+	QEventLoop loop;
+	connect(&fb,SIGNAL(userDataReady()),&loop,SLOT(quit()));
+	fb.fetchData();
+	loop.exec();
+	qDebug()<<"po petli";
+	User *u = fb.getUser();
+
+	_db->createUser(*u);
+
+	_stream << MessCodes::ok;
+	_socket->flush();
+
+	delete u;
+}
+
+/*
 void ConnectionThread::fetchFacebook()
 {
 	qDebug()<<"fetchFacebook";
@@ -229,3 +272,4 @@ void ConnectionThread::fetchFacebook()
 	FBsync fb;
 
 }
+*/
