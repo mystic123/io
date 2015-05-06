@@ -24,37 +24,63 @@ public:
     ~Client();
 
      Q_INVOKABLE Event* getEvent(id_type id);
-     Q_INVOKABLE void getUser();
-
-    Q_INVOKABLE void setChosenEvent(id_type id) {
-        chosenEvent = id;
-    }
+     Q_INVOKABLE User* getUser(id_type id);
 
      void setEngine(QQmlApplicationEngine *e) {
         engine = e;
      }
 
-     Q_INVOKABLE void chosenEventModel() {
+//     QList<QString> id_to_name(Event e) {
+//        QList<QString> r;
+//        for (id_type id: e.attending()) {
+//            r.append(getUser(id)->NICK);
+//        }
+//     }
+
+     Q_INVOKABLE void chosenEventModel(qint32 id) {
+         id_type id_tmp = id;
+         chosenEvent = *getEvent(id_tmp);
      }
 
-     void connect();
+     Q_INVOKABLE QString eventDesc() {
+         return chosenEvent.desc();
+     }
 
-     Q_INVOKABLE void login() {
-        my_id = 12;
-        this->connect();
-        this->getUser();
-        availableEvents = this->user->eventsInvited();
+     Q_INVOKABLE void addEvent(QString desc) {
+        Event e(my_id, desc);
+        _st << MessCodes::create_event;
+        _st << e;
+        _socket->flush();
+        _socket->waitForBytesWritten();
+        this->getUser(my_id);
+        qDebug() << user->eventsInvited();
+
+        availableEvents = user->eventsInvited();
 
         QList<QObject*> events;
-
-        id_type tmp = 14;
-        availableEvents.append(tmp);
 
         for (id_type id: availableEvents) {
             events.append(this->getEvent(id));
         }
 
-        engine->rootContext()->setContextProperty("myModel", QVariant::fromValue(events));
+        engine->rootContext()->setContextProperty("eventsList", QVariant::fromValue(events));
+     }
+
+     void connect();
+
+     Q_INVOKABLE void login() {
+        my_id = 5;
+        this->connect();
+        this->getUser(my_id);
+        availableEvents = user->eventsInvited();
+
+        QList<QObject*> events;
+
+        for (id_type id: availableEvents) {
+            events.append(this->getEvent(id));
+        }
+
+        engine->rootContext()->setContextProperty("eventsList", QVariant::fromValue(events));
      }
 
 signals:
@@ -67,9 +93,10 @@ private:
     QDataStream _st;
     id_type my_id;
     QQmlApplicationEngine *engine;
-    id_type chosenEvent;
     QList<id_type> availableEvents;
     User* user;
+    Event chosenEvent;
+
 };
 
 #endif // CPPCLASS_H

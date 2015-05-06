@@ -1,5 +1,5 @@
 import QtQuick 2.0
-
+import Bev 1.0 as Bev
 
 Rectangle {
     id: eventmenu
@@ -91,8 +91,7 @@ Rectangle {
 
                     Text {
                         id: infowhere
-                        //text: where + ", " + when
-                        text: "DUPADUPA"
+                        text: ""
                         anchors.horizontalCenter: parent.horizontalCenter
                         anchors.top: infowhat.bottom
                         anchors.topMargin: 0
@@ -105,7 +104,7 @@ Rectangle {
                     MouseArea {
                         anchors.fill: parent
                         onClicked: {
-
+                            Bev.Client.chosenEventModel(event_id)
                             sv.push(Qt.resolvedUrl("event.qml"))
                         }
                     }
@@ -114,30 +113,13 @@ Rectangle {
             }
         }
 
-        ListModel {
-            id: listModel
-
-            ListElement { name: "Dota"; where: "gdzie chcesz"; when: "21:00"; who: "User1" }
-            ListElement { name: "Frisbee"; where: "Pole Mokotowskie"; when: "16:00"; who: "User2" }
-            ListElement { name: "Narty"; where: "W górach"; when: "12:00"; who: "User3"  }
-            ListElement { name: "Festiwal Piwa"; where: "Kufle i Kapsle"; when: "20:00"; who: "User4"  }
-            ListElement { name: "Siatka"; where: "Orłowskiego 123"; when: "12:00"; who: "User5"  }
-            ListElement { name: "Pilka"; where: "Orlik na Ursynowie"; when: "15:00"; who: "User6"  }
-            ListElement { name: "Dota"; where: "gdzie chcesz"; when: "21:00"; who: "User1" }
-            ListElement { name: "Frisbee"; where: "Pole Mokotowskie"; when: "16:00"; who: "User2" }
-            ListElement { name: "Narty"; where: "W górach"; when: "12:00"; who: "User3"  }
-            ListElement { name: "Festiwal Piwa"; where: "Kufle i Kapsle"; when: "20:00"; who: "User4"  }
-            ListElement { name: "Siatka"; where: "Orłowskiego 123"; when: "12:00"; who: "User5"  }
-            ListElement { name: "Pilka"; where: "Orlik na Ursynowie"; when: "15:00"; who: "User6"  }
-        }
-
         spacing: 3
         highlightRangeMode: ListView.ApplyRange
         width: parent.width
         height: parent.height - ce.height
         anchors.top: ce.bottom
         anchors.topMargin: 3
-        model: myModel
+        model: eventsList
         delegate: listDelegate
     }
 }

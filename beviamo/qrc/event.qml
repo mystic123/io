@@ -1,5 +1,5 @@
 import QtQuick 2.0
-
+import Bev 1.0 as Bev
 Rectangle {
     color: "#101010"
     id: event
@@ -79,7 +79,7 @@ Rectangle {
             font.bold: true
             font.family: "Helvetica"
             color: "white"
-            text: qsTr("ALE FAJNY OPIS\nALE FAJNY OPIS\nALE FAJNY OPIS\nALE FAJNY OPIS")
+            text: Bev.Client.eventDesc()
             anchors.horizontalCenter: parent.horizontalCenter
             anchors.verticalCenter: parent.verticalCenter
         }
@@ -132,11 +132,11 @@ Rectangle {
         ListModel {
             id: listModel
 
-            ListElement { name: "Andrzej" }
-            ListElement { name: "Pszemek" }
-            ListElement { name: "Bartek" }
-            ListElement { name: "Maria" }
-            ListElement { name: "Leszek" }
+//            ListElement { name: "Andrzej" }
+//            ListElement { name: "Pszemek" }
+//            ListElement { name: "Bartek" }
+//            ListElement { name: "Maria" }
+//            ListElement { name: "Leszek" }
         }
 
         spacing: 3
@@ -146,7 +146,7 @@ Rectangle {
                 - descheader.height - description.height - 20
         anchors.top: joined.bottom
         anchors.topMargin: 5
-        model: myModel
+        model: listModel
         delegate: listDelegate
     }
 

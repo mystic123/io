@@ -1,6 +1,7 @@
 import QtQuick 2.0
 import QtQuick.Controls 1.2
 import QtQuick.Controls.Styles 1.2
+import Bev 1.0 as Bev
 
 Rectangle {
     id: createevent
@@ -109,6 +110,9 @@ Rectangle {
         MouseArea {
             anchors.fill: parent
             onClicked: {
+                Bev.Client.addEvent(desc.displayText);
+                sv.pop()
+                sv.pop()
                 sv.push(Qt.resolvedUrl("eventMenu.qml"))
             }
         }
