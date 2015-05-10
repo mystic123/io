@@ -8,9 +8,11 @@
 class DBController
 {
 public:
-	 DBController(){}
+    DBController(){}
     DBController(qintptr id);
     ~DBController();
+    /* getter */
+    QSqlDatabase db() {return this->_db;}
 
     /* User controller */
     int createUser(const User &u);
@@ -23,20 +25,12 @@ public:
     int updateEvent(const Event &e);
     int removeEvent(const Event &e);
     Event* getEvent(const id_type);
-    QSqlDatabase db()
-    {
-        return this->_db;
-    }
-
 
 private:
     QSqlDatabase _db;
-    void CUInside(const User &u);
     void RUInside(const User &u);
-    void CEInside(const Event &e);
+    void CEInside(const Event &e, bool isUpdated);
     void REInside(const Event &e);
-
-
 };
 
 #endif // DBCONTROLLER_H

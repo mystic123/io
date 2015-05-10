@@ -22,7 +22,6 @@ public:
 
 	/* getters */
 	id_type id() const;
-	id_type fbId() const;
 	QString email() const;
 	QString firstName() const;
 	QString lastName() const;
@@ -34,11 +33,11 @@ public:
 
 	/* setters */
 	void setId(const id_type &id);
-	void setFbId(const id_type &fbId);
 	void setEmail(const QString &email);
 	void setFirstName(const QString &firstName);
 	void setLastName(const QString &lastName);
 	void setGender(const QChar &gender);
+    void setName(const QString &name);
 	void setFriends(const QList<id_type> &friends);
 	void setEventsAttending(const QList<id_type> &eventsAttending);
 	void setEventsInvited(const QList<id_type> &eventsInvited);
@@ -58,7 +57,6 @@ public:
 
 private:
 	id_type _id;
-	id_type _fbId;
 	QString _email;
 	QString _firstName;
 	QString _lastName;

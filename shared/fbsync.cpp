@@ -66,8 +66,8 @@ void FBsync::fetchUserDataS(QNetworkReply *reply)
 	QJsonDocument jsonResponse = QJsonDocument::fromJson(str.toUtf8());
 	QJsonObject obj = jsonResponse.object();
 	_user = new User();
-	_user->setFbId(obj.find("id").value().toString().toLongLong());
-	qDebug() << "fbid:" << _user->fbId();
+    //_user->setFbId(obj.find("id").value().toString().toLongLong());
+    //qDebug() << "fbid:" << _user->fbId();
 	_user->setEmail(obj.find("email").value().toString());
 	qDebug() << "email:" << _user->email();
 	_user->setFirstName(obj.find("first_name").value().toString());

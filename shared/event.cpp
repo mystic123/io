@@ -56,12 +56,22 @@ QString Event::title() const
 
 QString Event::desc() const
 {
-	return _desc;
+    return _desc;
+}
+
+QString Event::location() const
+{
+    return _location;
 }
 
 QDateTime Event::date() const
 {
-	return _date;
+    return _date;
+}
+
+qint64 Event::how_long() const
+{
+    return _how_long;
 }
 
 QList<id_type> Event::invited() const
@@ -91,12 +101,22 @@ void Event::setTitle(const QString &title)
 
 void Event::setDesc(const QString &desc)
 {
-	_desc = desc;
+    _desc = desc;
+}
+
+void Event::setLocation(const QString &location)
+{
+    _location = location;
 }
 
 void Event::setDate(const QDateTime &date)
 {
-	_date = date;
+    _date = date;
+}
+
+void Event::setHow_long(const qint64 &how_long)
+{
+    _how_long = how_long;
 }
 
 void Event::setInvited(const QList<id_type> &invited)
@@ -150,7 +170,7 @@ Event Event::readEvent(QTcpSocket *s)
 		s->waitForReadyRead(REFRESH_TIME);
 	}
 
-	Event e;
+    Event e;
 	d >> e;
 	return e;
 }

@@ -6,7 +6,6 @@
 User::User(QObject *parent)
 {
 	_id = 0;
-	_fbId = 0;
 	_email = "";
 	_firstName = "";
 	_lastName = "";
@@ -19,7 +18,6 @@ User::User(QObject *parent)
 User::User(const User &u)
 {
 	this->_id = u.id();
-	this->_fbId = u.fbId();
 	this->_email = u.email();
 	this->_firstName = u.firstName();
 	this->_lastName = u.lastName();
@@ -44,11 +42,6 @@ User::~User()
 id_type User::id() const
 {
 	return _id;
-}
-
-id_type User::fbId() const
-{
-	return _fbId;
 }
 
 QString User::email() const
@@ -96,11 +89,6 @@ void User::setId(const id_type &id)
 	_id = id;
 }
 
-void User::setFbId(const id_type &fbId)
-{
-	_fbId = fbId;
-}
-
 void User::setEmail(const QString &email)
 {
 	_email = email;
@@ -124,7 +112,7 @@ void User::setGender(const QChar &gender)
 	else {
 		qDebug() << "WARNING: Wrong gender symbol. Allowed are:" << genders;
 		_gender = 'u';
-	}
+    }
 }
 
 void User::setFriends(const QList<id_type> &friends)
@@ -155,7 +143,6 @@ void User::addFrriend(const QList<id_type>& l)
 void User::operator=(const User& u)
 {
 	this->_id = u.id();
-	this->_fbId = u.fbId();
 	this->_email = u.email();
 	this->_firstName = u.firstName();
 	this->_lastName = u.lastName();
@@ -169,14 +156,14 @@ QDataStream& operator<<(QDataStream &out, const User &u)
 {
 	QByteArray array;
 	QDataStream stream(&array, QIODevice::WriteOnly);
-	stream << u._id << u._fbId << u._email << u._firstName << u._lastName << u._gender << u._friends << u._eventsAttending << u._eventsInvited;
+    stream << u._id << u._email << u._firstName << u._lastName << u._gender << u._friends << u._eventsAttending << u._eventsInvited;
 	out << array;
 	return out;
 }
 
 QDataStream& operator>>(QDataStream &in, User &u)
 {
-	in >> u._id >> u._fbId >> u._email >> u._firstName >> u._lastName >> u._gender >> u._friends >> u._eventsAttending >> u._eventsInvited;
+    in >> u._id >> u._email >> u._firstName >> u._lastName >> u._gender >> u._friends >> u._eventsAttending >> u._eventsInvited;
 	return in;
 }
 
