@@ -23,6 +23,7 @@ enum class MessCodes : qint32 {
 	join_event,
 	add_friend,
 	del_friend,
+	fb_friends_list,
 };
 
 /* refreshing time when waiting for data */

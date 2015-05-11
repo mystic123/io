@@ -2,6 +2,7 @@
 
 #include <QHostAddress>
 #include <QEventLoop>
+#include <QSet>
 
 #include "server.h"
 #include "fbsync.h"
@@ -18,6 +19,7 @@ const QMap<MessCodes, ConnectionThread::mem_func> ConnectionThread::_actions = {
 	{MessCodes::join_event, &ConnectionThread::joinEvent},
 	{MessCodes::add_friend, &ConnectionThread::addFriend},
 	{MessCodes::del_friend, &ConnectionThread::delFriend},
+	{MessCodes::fb_friends_list, &ConnectionThread::fbFriendsList},
 };
 
 ConnectionThread::ConnectionThread(qintptr ID, QObject *parent) : QThread(parent), _socket_desc(ID), _stream(), _user(nullptr), _db(new DBController(ID))
@@ -74,6 +76,9 @@ void ConnectionThread::readyRead()
 	}
 	else
 		qDebug()<<"error\n";
+	if (_socket->bytesAvailable() > 0) {
+		this->readyRead();
+	}
 }
 
 void ConnectionThread::disconnected()
@@ -93,9 +98,6 @@ void ConnectionThread::login()
 	_stream >> user_id;
 	qDebug() << "dostałem:" << user_id;
 	_user = _db->getUserById(user_id);
-	if (_socket->bytesAvailable() > 0) {
-		this->readyRead();
-	}
 }
 
 void ConnectionThread::userData()
@@ -119,9 +121,6 @@ void ConnectionThread::userData()
 		delete u;
 	}
 	_socket->flush();
-	if (_socket->bytesAvailable() > 0) {
-		this->readyRead();
-	}
 }
 
 void ConnectionThread::friendsList()
@@ -142,9 +141,6 @@ void ConnectionThread::friendsList()
 		_stream << u->friends();
 	}
 	_socket->flush();
-	if (_socket->bytesAvailable() > 0) {
-		this->readyRead();
-	}
 }
 
 void ConnectionThread::eventData()
@@ -162,9 +158,6 @@ void ConnectionThread::eventData()
 	_stream << *e;
 	_socket->flush();
 	delete e;
-	if (_socket->bytesAvailable() > 0) {
-		this->readyRead();
-	}
 }
 
 void ConnectionThread::createEvent()
@@ -173,8 +166,10 @@ void ConnectionThread::createEvent()
 
 	Event e = Event::readEvent(_socket);
 	_db->createEvent(e);
-	this->_user = _db->getUserById(_user->id());
-	qDebug() << _user->eventsAttending() << _user->eventsInvited();
+	id_type id = _user->id();
+	delete _user;
+	this->_user = _db->getUserById(id);
+	//qDebug() << _user->eventsAttending() << _user->eventsInvited();
 	_stream << MessCodes::ok;
 	_socket->flush();
 }
@@ -184,8 +179,10 @@ void ConnectionThread::updateEvent()
 	qDebug()<<"updateEvent";
 
 	Event e = Event::readEvent(_socket);
+	_db->updateEvent(e);
 	//qDebug() << e.desc();
-	_db->createEvent(e);
+	_stream << MessCodes::ok;
+	_socket->flush();
 }
 
 void ConnectionThread::inviteEvent()
@@ -207,11 +204,31 @@ void ConnectionThread::joinEvent()
 void ConnectionThread::addFriend()
 {
 	qDebug()<<"addFriend";
+
+	id_type id;
+	_stream >> id;
+	this->_user->addFriend(id);
+	_db->updateUser(*_user);
+	id_type mid = _user->id();
+	delete _user;
+	_user = _db->getUserById(mid);
+	_stream << MessCodes::ok;
+	_socket->flush();
 }
 
 void ConnectionThread::delFriend()
 {
 	qDebug()<<"delFriend";
+
+	id_type id;
+	_stream >> id;
+	this->_user->delFriend(id);
+	_db->updateUser(*_user);
+	id_type mid = _user->id();
+	delete _user;
+	_user = _db->getUserById(mid);
+	_stream << MessCodes::ok;
+	_socket->flush();
 }
 
 void ConnectionThread::signup()
@@ -240,20 +257,17 @@ void ConnectionThread::signup()
 	fb.fetchData();
 	loop.exec();
 	qDebug()<<"po petli";
-	User *u = fb.getUser();
+	_user = fb.getUser();
 
-	_db->createUser(*u);
+	_db->createUser(*_user);
 
 	_stream << MessCodes::ok;
 	_socket->flush();
-
-	delete u;
 }
 
-/*
-void ConnectionThread::fetchFacebook()
+void ConnectionThread::fbFriendsList()
 {
-	qDebug()<<"fetchFacebook";
+	qDebug()<<"signup";
 
 	while (_socket->bytesAvailable() < sizeof(qint32)) {
 		_socket->waitForReadyRead(REFRESH_TIME);
@@ -270,6 +284,25 @@ void ConnectionThread::fetchFacebook()
 	_stream >> token;
 
 	FBsync fb;
+	fb.setToken(token);
 
+	QEventLoop loop;
+	connect(&fb,SIGNAL(userDataReady()),&loop,SLOT(quit()));
+	fb.fetchData();
+	loop.exec();
+
+	QList<id_type> fb_list = fb.friendsList();
+
+	QList<id_type> user_list = _user->friends();
+
+	QSet<id_type> fb_set = QSet<id_type>::fromList(fb_list);
+
+	QSet<id_type> user_set = QSet<id_type>::fromList(user_list);
+
+	QSet<id_type> intersect = fb_set.intersect(user_set);
+
+	fb_set = fb_set.subtract(intersect);
+
+	_stream << fb_set.toList();
+	_socket->flush();
 }
-*/

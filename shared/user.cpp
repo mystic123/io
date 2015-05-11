@@ -135,9 +135,26 @@ void User::addFriend(id_type id)
 	_friends.append(id);
 }
 
-void User::addFrriend(const QList<id_type>& l)
+void User::addFriend(const QList<id_type>& l)
 {
 	_friends.append(l);
+}
+
+void User::delFriend(id_type id)
+{
+	if (_friends.contains(id)) {
+		auto it = _friends.begin();
+		while (*it != id)
+			it++;
+		_friends.erase(it);
+	}
+}
+
+void User::delFriend(const QList<id_type>& l)
+{
+	for (auto x : l) {
+		delFriend(x);
+	}
 }
 
 void User::operator=(const User& u)

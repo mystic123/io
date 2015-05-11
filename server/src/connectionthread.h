@@ -43,6 +43,7 @@ private:
 	void addFriend();
 	void delFriend();
 	void signup();
+	void fbFriendsList();
 
 	QTcpSocket *_socket;
 	qintptr _socket_desc;

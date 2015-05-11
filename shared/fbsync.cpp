@@ -11,7 +11,7 @@
 const QString FBsync::APP_ID = "1615817788631871";
 const QString FBsync::APP_SECRET = "83ce02d3d91543dc4671f47de0e71a20";
 
-FBsync::FBsync(QObject *parent) : QObject(parent), _token("")
+FBsync::FBsync(QObject *parent) : QObject(parent), _token(""), _user(nullptr)
 {
 }
 
@@ -24,6 +24,18 @@ void FBsync::fetchData()
 	fetchUserData();
 	fetchFriends();
 	emit userDataReady();
+}
+
+QList<id_type> FBsync::friendsList()
+{
+	if (_user) {
+		return _user->friends();
+		emit userDataReady();
+	}
+	else {
+		fetchData();
+		return _user->friends();
+	}
 }
 
 void FBsync::setToken(const QString &token)

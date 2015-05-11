@@ -43,7 +43,9 @@ public:
 	void setEventsInvited(const QList<id_type> &eventsInvited);
 
 	void addFriend(id_type);
-	void addFrriend(const QList<id_type>&);
+	void addFriend(const QList<id_type>&);
+	void delFriend(id_type);
+	void delFriend(const QList<id_type>&);
 
 	/* opertators */
 	void operator=(const User&);

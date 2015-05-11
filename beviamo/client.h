@@ -47,7 +47,9 @@ public:
      }
 
      Q_INVOKABLE void addEvent(QString desc) {
-        Event e(my_id, desc);
+		  Event e;//(my_id, desc);
+		  e.setDesc(desc);
+		  e.setFounder(my_id);
         _st << MessCodes::create_event;
         _st << e;
         _socket->flush();

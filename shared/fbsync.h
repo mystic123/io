@@ -3,6 +3,7 @@
 
 #include <QObject>
 #include <QNetworkReply>
+#include <QList>
 
 #include "global.h"
 #include "user.h"
@@ -16,6 +17,7 @@ public:
 	~FBsync();
 
 	void fetchData();
+	QList<id_type> friendsList();
 	void setToken(const QString& token);
 
 	User* getUser() const;
