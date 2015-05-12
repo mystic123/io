@@ -109,7 +109,7 @@ Rectangle {
 
         MouseArea {
             anchors.fill: parent
-            onClicked: {
+            onClicked: {                
                 Bev.Client.addEvent(desc.displayText);
                 sv.pop()
                 sv.pop()

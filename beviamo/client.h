@@ -10,6 +10,8 @@
 #include <QDataStream>
 #include <QVariant>
 #include <QQmlContext>
+#include <QUrl>
+#include <QRegularExpression>
 
 #include "event.h"
 #include "global.h"
@@ -46,17 +48,25 @@ public:
          return chosenEvent.desc();
      }
 
-     Q_INVOKABLE void addEvent(QString desc) {
-		  Event e;//(my_id, desc);
-		  e.setDesc(desc);
-		  e.setFounder(my_id);
+     Q_INVOKABLE void addEvent(QString title, QString desc, QString loc) {
+         Event e;
+         e.setFounder(my_id);
+         e.setTitle(title);
+         e.setDesc(desc);
+         e.setLocation(loc);
+         e.setDate(date);
+         e.setHow_long(hl);
+
         _st << MessCodes::create_event;
         _st << e;
         _socket->flush();
         _socket->waitForBytesWritten();
         this->getUser(my_id);
-        qDebug() << user->eventsInvited();
+        //qDebug() << user->eventsInvited();
+        EventsRefresh();
+     }
 
+    void EventsRefresh() {
         availableEvents = user->eventsInvited();
 
         QList<QObject*> events;
@@ -66,23 +76,117 @@ public:
         }
 
         engine->rootContext()->setContextProperty("eventsList", QVariant::fromValue(events));
+    }
+
+    void FbFriendListRefresh() {
+        QList<id_type> fbfriends;
+
+        _st << MessCodes::fb_friends_list;
+        _socket->flush();
+        _st >> fbfriends;
+
+        QList<QObject*> flist;
+
+        for (id_type id: fbfriends) {
+            flist.append(this->getFriend(id));
+        }
+
+        engine->rootContext()->setContextProperty("facebookFriendsList", QVariant::fromValue(flist));
+
+    }
+
+    void FriendListRefresh() {
+        QList<id_type> friends = user->friends();
+
+        QList<QObject*> flist;
+
+        for (id_type id: friends) {
+         flist.append(this->getFriend(id));
+        }
+
+        engine->rootContext()->setContextProperty("friendsList", QVariant::fromValue(flist));
+    }
+
+    Q_INVOKABLE void delFriend(qint32 id) {
+        qDebug() << "usuwam: " << id;
+        _st << MessCodes::del_friend;
+        _socket->flush();
+        _st << id;
+        _socket->flush();
+        _socket->waitForBytesWritten();
+        this->getUser(my_id);
+        FriendListRefresh();
      }
+
+    Q_INVOKABLE void addFriend(qint32 id) {
+        qDebug() << "dodaje: " << id;
+        _st << MessCodes::add_friend;
+        _socket->flush();
+        _st << id;
+        _socket->flush();
+        _socket->waitForBytesWritten();
+        this->getUser(my_id);
+        FriendListRefresh();
+    }
 
      void connect();
 
+     User* getFriend(id_type id)
+     {
+         _st << MessCodes::user_data;
+         _socket->flush();
+         _st << id;
+         _socket->flush();
+
+         User *u = new User();
+         *u = User::readUser(_socket);
+         return u;
+     }
+
      Q_INVOKABLE void login() {
-        my_id = 5;
-        this->connect();
-        this->getUser(my_id);
-        availableEvents = user->eventsInvited();
+         this->connect();
+         this->getUser(my_id);
+         //EventsRefresh();
+         //FriendListRefresh();
+         //FbFriendListRefresh();
+     }
 
-        QList<QObject*> events;
+     Q_INVOKABLE void set_logout_url() {
+        QString logoutUrl = QStringLiteral("https://www.facebook.com/logout.php?next=http://localhost/&access_token=");
+        logoutUrl.append(token);
+        qDebug() << logoutUrl;
+        engine->rootContext()->setContextProperty(QStringLiteral("logoutUrl"), logoutUrl);
+     }
 
-        for (id_type id: availableEvents) {
-            events.append(this->getEvent(id));
-        }
+     Q_INVOKABLE bool access_url(QString url) {
+       QRegularExpression re(".+login_success.html#access_token=(.+)&");
+       QRegularExpressionMatch match = re.match(url);
+       if (match.hasMatch()) {
+           QString a = match.captured(1);
+           token = a;
 
-        engine->rootContext()->setContextProperty("eventsList", QVariant::fromValue(events));
+           //qDebug() << token << sizeof(token);
+           _st << MessCodes::signup;
+           _socket->flush();
+           _st << (qint32) token.size();
+           _st << token;
+           _socket->flush();
+           _socket->waitForBytesWritten();
+
+           while (_socket->bytesAvailable() < sizeof(id_type)) {
+               _socket->waitForReadyRead(1);
+           }
+
+           id_type id;
+           _st >> id;
+           my_id = id;
+
+           qDebug() << "MOJE ID: " << my_id;
+
+           login();
+           return true;
+       }
+       return false;
      }
 
 signals:
@@ -98,7 +202,7 @@ private:
     QList<id_type> availableEvents;
     User* user;
     Event chosenEvent;
-
+    QString token;
 };
 
 #endif // CPPCLASS_H

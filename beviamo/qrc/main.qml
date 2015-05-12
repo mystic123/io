@@ -17,11 +17,11 @@ ApplicationWindow {
             anchors.fill: parent
             focus: true
 
-            initialItem: Qt.resolvedUrl("welcome.qml")
+            initialItem: Qt.resolvedUrl("FacebookView.qml")
 
             Keys.onReleased: {
-                console.log("KEY_PRESSED: " + event.key)
-                console.log("depth: " + sv.depth)
+//                console.log("KEY_PRESSED: " + event.key)
+//                console.log("depth: " + sv.depth)
                 if (event.key === Qt.Key_Back) {
                     if (sv.depth > 1) {
                         sv.pop();
@@ -33,10 +33,5 @@ ApplicationWindow {
                 }
             }
         }
-
-//        onClicked: {
-//            sv.push(Qt.resolvedUrl("login.qml"))
-//        }
-
     }
 }

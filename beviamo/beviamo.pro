@@ -2,6 +2,11 @@ TEMPLATE = app
 
 QT += qml quick core widgets network
 
+qtHaveModule(webengine) {
+        QT += webengine
+        DEFINES += QT_WEBVIEW_WEBENGINE_BACKEND
+}
+
 INCLUDEPATH += ../shared/
 
 SOURCES += \

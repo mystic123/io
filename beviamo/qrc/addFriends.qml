@@ -1,36 +1,17 @@
 import QtQuick 2.0
+import QtQuick.Controls 1.2
+import QtQuick.Controls.Styles 1.2
+import Bev 1.0 as Bev
 
 Rectangle {
-    id: friendsmenu
+    id: addfriends
     color: "#101010"
-
-    Rectangle {
-        id: add
-        width: parent.width
-        height: parent.height/10
-        anchors.left: parent.left
-        anchors.leftMargin: 0
+    Image {
+        id: icon
         anchors.top: parent.top
         anchors.topMargin: 0
-        z: 1
-        color: "#2f7ffa"
-
-        Text {
-            font.pointSize: 18
-            font.bold: true
-            font.family: "Helvetica"
-            color: "white"
-            text: qsTr("ADD NEW FRIENDS")
-            anchors.horizontalCenter: parent.horizontalCenter
-            anchors.verticalCenter: parent.verticalCenter
-        }
-
-        MouseArea {
-            anchors.fill: parent
-            onClicked: {
-                sv.push(Qt.resolvedUrl("addFriends.qml"))
-            }
-        }
+        anchors.horizontalCenter: parent.horizontalCenter
+        source: "../images/icon/96.png"
     }
 
     ListView {
@@ -50,7 +31,7 @@ Rectangle {
                     height: parent.height * 1 / 20
 
                     Text {
-                        id: who
+                        id: infowhat
                         text: fName + " " + lName
                         anchors.horizontalCenter: parent.horizontalCenter
                         font.pointSize: 14
@@ -67,13 +48,11 @@ Rectangle {
 
                         Rectangle {
                             anchors.fill: parent
-                            color: red
+                            color: green
                         }
 
                         onClicked: {
                             Bev.Client.addFriend(user_id)
-                            sv.pop()
-                            sv.push(Qt.resolvedUrl("friendsMenu.qml"))
                         }
                     }
 
@@ -84,11 +63,12 @@ Rectangle {
         spacing: 3
         highlightRangeMode: ListView.ApplyRange
         width: parent.width
-        height: parent.height - add.height
-        anchors.top: add.bottom
+        height: parent.height - icon.height
+        anchors.top: icon.bottom
         anchors.topMargin: 3
-        model: friendsList
+        model: facebookFriendsList
         delegate: listDelegate
     }
+
 }
 

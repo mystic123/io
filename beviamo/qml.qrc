@@ -11,5 +11,8 @@
         <file>qrc/friendsMenu.qml</file>
         <file>qrc/event.qml</file>
         <file>qrc/createEvent.qml</file>
+        <file>qrc/FacebookView.qml</file>
+        <file>qrc/addFriends.qml</file>
+        <file>qrc/fbLogOut.qml</file>
     </qresource>
 </RCC>

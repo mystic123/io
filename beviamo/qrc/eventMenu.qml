@@ -7,7 +7,7 @@ Rectangle {
 
     Rectangle {
         id: friends
-        width: parent.width/2
+        width: parent.width * 4 / 10
         height: parent.height/10
         anchors.left: parent.left
         anchors.leftMargin: 0
@@ -36,7 +36,7 @@ Rectangle {
 
     Rectangle {
         id: ce
-        width: parent.width/2
+        width: parent.width * 4 / 10
         height: parent.height/10
         anchors.left: friends.right
         anchors.leftMargin: 1
@@ -59,6 +59,38 @@ Rectangle {
             anchors.fill: parent
             onClicked: {
                 sv.push(Qt.resolvedUrl("createEvent.qml"))
+            }
+        }
+    }
+
+
+    Rectangle {
+        id: logout
+        width: parent.width * 2 / 10
+        height: parent.height/10
+        anchors.left: ce.right
+        anchors.leftMargin: 1
+        anchors.top: parent.top
+        anchors.topMargin: 0
+        z: 1
+        color: "#2f7ffa"
+
+        Text {
+            font.pointSize: 12
+            font.bold: true
+            font.family: "Helvetica"
+            color: "white"
+            text: qsTr("LOG OUT")
+            anchors.horizontalCenter: parent.horizontalCenter
+            anchors.verticalCenter: parent.verticalCenter
+        }
+
+        MouseArea {
+            anchors.fill: parent
+            onClicked: {
+                Bev.Client.set_logout_url();
+                sv.clear();
+                sv.push(Qt.resolvedUrl("fbLogOut.qml"))
             }
         }
     }
@@ -122,5 +154,7 @@ Rectangle {
         model: eventsList
         delegate: listDelegate
     }
+
+
 }
 
