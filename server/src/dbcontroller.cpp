@@ -13,25 +13,34 @@ DBController::DBController(qintptr id){
 //   db.setUserName("mystic123_beviamo");
 //   db.setPassword("beviamo");
 //   db.setDatabaseName("mystic123_beviamo");
-//	 db.setHostName("localhost");
-//	 db.setUserName("beviamo");
-//	 db.setPassword("beviamo");
-//	 db.setDatabaseName("beviamo");
+
+	db.setHostName("localhost");
+	 db.setUserName("beviamo");
+	 db.setPassword("beviamo");
+	 db.setDatabaseName("beviamo");
 
 /*to change*/
-
+/*
     db.setHostName("localhost");
     db.setUserName("postgres");
     db.setPassword("x");
     db.setDatabaseName("mydb");
-    this->_db = db;
+  */
+  this->_db = db;
     this->_db.open();
 }
 
 int DBController::createUser(const User &u)
 {
     if (db().isValid()){
-        if (db().isOpen()){
+		  if (db().isOpen()){
+			  qDebug() <<" jeszcze raz tutaj:";
+			  qDebug() << "id:" << u.id();
+			 qDebug() << "email:" << u.email();
+			 qDebug() << "first name:" << u.firstName();
+			 qDebug() << "last name:" << u.lastName();
+			 qDebug() << "gender:" << u.gender();
+				//db().transaction();
             QSqlQuery query(db());
             /* protection against sql injection, inserting new user */
             query.prepare("INSERT INTO users (u_id, email, first_name, last_name, gender)"
@@ -63,6 +72,7 @@ int DBController::createUser(const User &u)
                 query.prepare(pre);
                 query.exec();
             }
+				//db().commit();
         } else return -1;
     } else return -1;
     return 0;

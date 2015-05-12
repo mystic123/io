@@ -235,18 +235,18 @@ void ConnectionThread::signup()
 {
 	qDebug()<<"signup";
 
+
 	while (_socket->bytesAvailable() < sizeof(qint32)) {
 		_socket->waitForReadyRead(REFRESH_TIME);
 	}
 
 	qint32 size;
 	_stream >> size;
-
 	while (_socket->bytesAvailable() < size) {
 		_socket->waitForReadyRead(REFRESH_TIME);
 	}
 
-	QString token;
+	QString token(size);
 	_stream >> token;
 
 	FBsync fb;
@@ -257,17 +257,31 @@ void ConnectionThread::signup()
 	fb.fetchData();
 	loop.exec();
 	qDebug()<<"po petli";
-	_user = fb.getUser();
+	//_user = fb.getUser();
 
-	_db->createUser(*_user);
+	User u = fb.getUser();
+	qDebug() <<" jeszcze raz:";
+	qDebug() << "id:" << u.id();
+  qDebug() << "email:" << u.email();
+  qDebug() << "first name:" << u.firstName();
+  qDebug() << "last name:" << u.lastName();
+  qDebug() << "gender:" << u.gender();
+  u.setFriends({});
+  u.setEventsAttending({});
+  u.setEventsInvited({});
 
-	_stream << MessCodes::ok;
+  //qDebug() <<"jestem";
+	_db->createUser(u);
+
+	_stream << u.id();
+	_user = _db->getUserById(u.id());
+	qDebug() << "id: " << _user->id();
 	_socket->flush();
 }
 
 void ConnectionThread::fbFriendsList()
 {
-	qDebug()<<"signup";
+	qDebug()<<"fb_friends";
 
 	while (_socket->bytesAvailable() < sizeof(qint32)) {
 		_socket->waitForReadyRead(REFRESH_TIME);

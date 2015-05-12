@@ -20,7 +20,7 @@ public:
 	QList<id_type> friendsList();
 	void setToken(const QString& token);
 
-	User* getUser() const;
+	User getUser() const;
 
 signals:
 	void userDataReady();
@@ -36,7 +36,7 @@ private:
 	static const QString APP_ID;
 	static const QString APP_SECRET;
 	QString _token;
-	User *_user;
+	User _user;
 
 };
 
