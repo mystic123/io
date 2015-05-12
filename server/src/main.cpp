@@ -123,10 +123,16 @@ void testRemoveEvent(){
 int main(int argc, char *argv[])
 {
     /* przed uzyciem
-     * wyczyscic baze danych */
+	  * wyczyscic baze danych
     testCreateUser();
     testUpdateUser();
     testCreateEvent();
     testUpdateEvent();
+	 */
+
+	QCoreApplication a(argc,argv);
+	Server server;
+	server.startServer();
+	return a.exec();
 }
 
