@@ -9,7 +9,9 @@ Event::Event(QObject *parent)
 	_founder = 0;
 	_title = "";
 	_desc = "";
+	_location = "";
 	_date = QDateTime();
+	_how_long = 0;
 	_invited = {};
 	_attending = {};
 }
@@ -24,8 +26,9 @@ Event::Event(const id_type id1, const id_type id2, const QString q, const QList<
 }
 
 Event::Event(const Event& e): _id(e.id()), _founder(e.founder()),
-										_desc(e.desc()), _date(e.date()),
-										_invited(e.invited()), _attending(e.attending())
+	_title(e.desc()), _desc(e.desc()), _location(e.location()),
+	_date(e.date()), _how_long(e.how_long()), _invited(e.invited()),
+	_attending(e.attending())
 {
 }
 
@@ -136,6 +139,7 @@ void Event::operator=(const Event& e)
 	this->_title = e.title();
 	this->_desc = e.desc();
 	this->_date = e.date();
+	this->_location = e.location();
 	this->_invited = e.invited();
 	this->_attending = e.attending();
 }
