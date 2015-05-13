@@ -45,6 +45,8 @@ private:
 	void signup();
 	void fbFriendsList();
 
+	void sendOK();
+
 	QTcpSocket *_socket;
 	qintptr _socket_desc;
 	QDataStream _stream;

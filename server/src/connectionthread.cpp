@@ -165,13 +165,26 @@ void ConnectionThread::createEvent()
 	qDebug()<<"createEvent";
 
 	Event e = Event::readEvent(_socket);
+
+	e.setInvited({});
+	e.setAttending({});
+	qDebug() << "id:" << e.id();
+	qDebug() << "founder:" << e.founder();
+	qDebug() << "title:" << e.title();
+	qDebug() << "desc:" << e.desc();
+	qDebug() << "location:" << e.location();
+	qDebug() << "date:" << e.date();
+	qDebug() << "howlong:" << e.how_long();
+	qDebug() << "invited:" << e.invited();
+	qDebug() << "attending:" << e.attending();
+	e.setInvited({});
+	e.setAttending({});
 	_db->createEvent(e);
 	id_type id = _user->id();
 	delete _user;
 	this->_user = _db->getUserById(id);
 	//qDebug() << _user->eventsAttending() << _user->eventsInvited();
-	_stream << MessCodes::ok;
-	_socket->flush();
+	sendOK();
 }
 
 void ConnectionThread::updateEvent()
@@ -181,8 +194,7 @@ void ConnectionThread::updateEvent()
 	Event e = Event::readEvent(_socket);
 	_db->updateEvent(e);
 	//qDebug() << e.desc();
-	_stream << MessCodes::ok;
-	_socket->flush();
+	sendOK();
 }
 
 void ConnectionThread::inviteEvent()
@@ -212,8 +224,7 @@ void ConnectionThread::addFriend()
 	id_type mid = _user->id();
 	delete _user;
 	_user = _db->getUserById(mid);
-	_stream << MessCodes::ok;
-	_socket->flush();
+	sendOK();
 }
 
 void ConnectionThread::delFriend()
@@ -227,8 +238,7 @@ void ConnectionThread::delFriend()
 	id_type mid = _user->id();
 	delete _user;
 	_user = _db->getUserById(mid);
-	_stream << MessCodes::ok;
-	_socket->flush();
+	sendOK();
 }
 
 void ConnectionThread::signup()
@@ -277,6 +287,8 @@ void ConnectionThread::signup()
 	_user = _db->getUserById(u.id());
 	qDebug() << "id: " << _user->id();
 	_socket->flush();
+
+	sendOK();
 }
 
 void ConnectionThread::fbFriendsList()
@@ -301,7 +313,7 @@ void ConnectionThread::fbFriendsList()
 	fb.setToken(token);
 
 	QEventLoop loop;
-	connect(&fb,SIGNAL(userDataReady()),&loop,SLOT(quit()));
+	connect(&fb,SIGNAL(userDataReady()),&loop,SLOT(quit()), Qt::QueuedConnection);
 	fb.fetchData();
 	loop.exec();
 
@@ -318,5 +330,11 @@ void ConnectionThread::fbFriendsList()
 	fb_set = fb_set.subtract(intersect);
 
 	_stream << fb_set.toList();
+	_socket->flush();
+}
+
+void ConnectionThread::sendOK()
+{
+	_stream << MessCodes::ok;
 	_socket->flush();
 }

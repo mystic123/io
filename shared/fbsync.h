@@ -37,6 +37,8 @@ private:
 	static const QString APP_SECRET;
 	QString _token;
 	User _user;
+	bool _dataReady;
+	bool _friendsReady;
 
 };
 
