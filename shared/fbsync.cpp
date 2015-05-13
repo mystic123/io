@@ -11,7 +11,7 @@
 const QString FBsync::APP_ID = "1615817788631871";
 const QString FBsync::APP_SECRET = "83ce02d3d91543dc4671f47de0e71a20";
 
-FBsync::FBsync(QObject *parent) : QObject(parent), _token(""), _user(nullptr)
+FBsync::FBsync(QObject *parent) : QObject(parent), _token(""), _user(nullptr), _dataReady(false), _friendsReady(false)
 {
 }
 
@@ -29,15 +29,14 @@ void FBsync::fetchData()
 
 QList<id_type> FBsync::friendsList()
 {
-	/*
-	if (_user) {
-		return _user->friends();
+	if (_user.id() != 0) {
+		return _user.friends();
 		emit userDataReady();
 	}
-	else {*/
+	else {
 		fetchData();
 		return _user.friends();
-	//}
+	}
 }
 
 void FBsync::setToken(const QString &token)
@@ -76,11 +75,9 @@ void FBsync::fetchFriends()
 
 void FBsync::fetchUserDataS(QNetworkReply *reply)
 {
-	qDebug() << "tututjttjt";
 	QString str = reply->readAll();
 	QJsonDocument jsonResponse = QJsonDocument::fromJson(str.toUtf8());
 	QJsonObject obj = jsonResponse.object();
-	//qDebug() << "tu: " <<  obj;
 	_user.setId(obj.find("id").value().toString().toLongLong());
 	 qDebug() << "id:" << _user.id();
 	_user.setEmail(obj.find("email").value().toString());
@@ -92,7 +89,9 @@ void FBsync::fetchUserDataS(QNetworkReply *reply)
 	_user.setGender(obj.find("gender").value().toString().at(0));
 	qDebug() << "gender:" << _user.gender();
 
-	emit userDataReady();
+	_dataReady = true;
+	if (_friendsReady)
+		emit userDataReady();
 }
 
 void FBsync::fetchFriendsS(QNetworkReply *reply)
@@ -103,11 +102,12 @@ void FBsync::fetchFriendsS(QNetworkReply *reply)
 	//qDebug() << arr;
 	for (QJsonValue x : arr) {
 		//qDebug() << x.toObject().value("id");
-		//_user->addFriend(x.toObject().value("id").toString().toULongLong());
+		//_user.addFriend(x.toObject().value("id").toString().toULongLong());
 		qDebug() << "added:" << x.toObject().value("id").toString().toULongLong();
 	}
 
-
-	qDebug() << "koniec";
+	_friendsReady = true;
+	if (_dataReady)
+		emit userDataReady();
 }
 

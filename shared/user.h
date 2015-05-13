@@ -37,7 +37,6 @@ public:
 	void setFirstName(const QString &firstName);
 	void setLastName(const QString &lastName);
 	void setGender(const QChar &gender);
-    void setName(const QString &name);
 	void setFriends(const QList<id_type> &friends);
 	void setEventsAttending(const QList<id_type> &eventsAttending);
 	void setEventsInvited(const QList<id_type> &eventsInvited);

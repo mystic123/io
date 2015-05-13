@@ -8,16 +8,16 @@ DBController::~DBController() {
 }
 
 DBController::DBController(qintptr id){
-   QSqlDatabase db = QSqlDatabase::addDatabase("QPSQL", QString::number(id));
-//   db.setHostName("postgresql-mystic123.alwaysdata.net");
-//   db.setUserName("mystic123_beviamo");
-//   db.setPassword("beviamo");
-//   db.setDatabaseName("mystic123_beviamo");
+	QSqlDatabase db = QSqlDatabase::addDatabase("QPSQL", QString::number(id));
+	db.setHostName("postgresql-mystic123.alwaysdata.net");
+	db.setUserName("mystic123_beviamo");
+	db.setPassword("beviamo");
+	db.setDatabaseName("mystic123_beviamo");
 
-	db.setHostName("localhost");
-	 db.setUserName("beviamo");
-	 db.setPassword("beviamo");
-	 db.setDatabaseName("beviamo");
+//	db.setHostName("localhost");
+//	 db.setUserName("beviamo");
+//	 db.setPassword("beviamo");
+//	 db.setDatabaseName("beviamo");
 
 /*to change*/
 /*
