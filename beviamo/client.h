@@ -54,8 +54,8 @@ public:
          e.setTitle(title);
          e.setDesc(desc);
          e.setLocation(loc);
-         e.setDate(date);
-         e.setHow_long(hl);
+		//   e.setDate(date);
+		 //  e.setHow_long(hl);
 
         _st << MessCodes::create_event;
         _st << e;

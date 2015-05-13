@@ -34,13 +34,7 @@ int DBController::createUser(const User &u)
 {
     if (db().isValid()){
 		  if (db().isOpen()){
-			  qDebug() <<" jeszcze raz tutaj:";
-			  qDebug() << "id:" << u.id();
-			 qDebug() << "email:" << u.email();
-			 qDebug() << "first name:" << u.firstName();
-			 qDebug() << "last name:" << u.lastName();
-			 qDebug() << "gender:" << u.gender();
-				//db().transaction();
+				db().transaction();
             QSqlQuery query(db());
             /* protection against sql injection, inserting new user */
             query.prepare("INSERT INTO users (u_id, email, first_name, last_name, gender)"
@@ -72,7 +66,7 @@ int DBController::createUser(const User &u)
                 query.prepare(pre);
                 query.exec();
             }
-				//db().commit();
+				db().commit();
         } else return -1;
     } else return -1;
     return 0;
@@ -83,6 +77,7 @@ int DBController::updateUser(const User &u)
     if (db().isValid()){
         if (db().isOpen()){
             QSqlQuery query(db());
+				db().transaction();
             /* protection against sql injection, inserting new user */
             query.prepare("UPDATE users SET email=?, first_name=?, last_name=?, gender=? WHERE u_id=" + QVariant(u.id()).toString() + ";");
             query.addBindValue(QVariant(u.email()).toString());
@@ -114,6 +109,7 @@ int DBController::updateUser(const User &u)
                 query.prepare(pre);
                 query.exec();
             }
+				db().commit();
          } else return -1;
     } else return -1;
     return 0;

@@ -144,14 +144,14 @@ QDataStream& operator<<(QDataStream& out, const Event& e)
 {
 	QByteArray array;
 	QDataStream stream(&array, QIODevice::WriteOnly);
-	stream << e._id << e._founder << e._title << e._desc << e._invited << e._attending;
+	stream << e._id << e._founder << e._title << e._desc << e._location << e._date << e._how_long << e._invited << e._attending;
 	out << array;
 	return out;
 }
 
 QDataStream& operator>>(QDataStream& in, Event&e)
 {
-	 in >> e._id >> e._founder >> e._title >> e._desc >> e._invited >> e._attending;
+	 in >> e._id >> e._founder >> e._title >> e._desc >> e._location >> e._date >> e._how_long >> e._invited >> e._attending;
 	 return in;
 }
 
