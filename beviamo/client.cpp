@@ -5,7 +5,7 @@
 Client::Client(QObject *parent) : QObject(parent)
 {
     _socket = new QTcpSocket();
-    _socket->connectToHost("10.20.7.1", 10777);
+    _socket->connectToHost("10.20.4.165", 10777);
     _socket->waitForConnected();
     qDebug() << _socket->state();
     _st.setDevice(_socket);

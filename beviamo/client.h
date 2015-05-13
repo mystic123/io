@@ -54,13 +54,21 @@ public:
          e.setTitle(title);
          e.setDesc(desc);
          e.setLocation(loc);
-         e.setDate(date);
-         e.setHow_long(hl);
-
+         e.setDate(QDateTime::currentDateTime());
+         qDebug() << QDateTime::currentDateTime();
+         e.setHow_long(1);
         _st << MessCodes::create_event;
         _st << e;
         _socket->flush();
         _socket->waitForBytesWritten();
+
+        while (_socket->bytesAvailable() < sizeof(qint32)) {
+            _socket->waitForReadyRead(1);
+        }
+
+        qint32 ok;
+        _st >> ok;
+
         this->getUser(my_id);
         //qDebug() << user->eventsInvited();
         EventsRefresh();
@@ -114,6 +122,14 @@ public:
         _st << id;
         _socket->flush();
         _socket->waitForBytesWritten();
+
+        while (_socket->bytesAvailable() < sizeof(qint32)) {
+            _socket->waitForReadyRead(1);
+        }
+
+        qint32 ok;
+        _st >> ok;
+
         this->getUser(my_id);
         FriendListRefresh();
      }
@@ -125,6 +141,14 @@ public:
         _st << id;
         _socket->flush();
         _socket->waitForBytesWritten();
+
+        while (_socket->bytesAvailable() < sizeof(qint32)) {
+            _socket->waitForReadyRead(1);
+        }
+
+        qint32 ok;
+        _st >> ok;
+
         this->getUser(my_id);
         FriendListRefresh();
     }
@@ -146,7 +170,7 @@ public:
      Q_INVOKABLE void login() {
          this->connect();
          this->getUser(my_id);
-         //EventsRefresh();
+         EventsRefresh();
          //FriendListRefresh();
          //FbFriendListRefresh();
      }

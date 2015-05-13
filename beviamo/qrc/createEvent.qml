@@ -52,23 +52,23 @@ Rectangle {
         }
     }
 
-    TextField {
-        id: when
-        placeholderText: qsTr("when?")
-        width: parent.width
-        height: parent.height/13
-        anchors.left: parent.left
-        anchors.leftMargin: 0
-        anchors.top: where.bottom
-        anchors.topMargin: 3
-        textColor: "white"
-        style: TextFieldStyle {
-            placeholderTextColor: "#A8A8A8"
-            background: Rectangle {
-                color: "#282828"
-            }
-        }
-    }
+//    TextField {
+//        id: when
+//        placeholderText: qsTr("when?")
+//        width: parent.width
+//        height: parent.height/13
+//        anchors.left: parent.left
+//        anchors.leftMargin: 0
+//        anchors.top: where.bottom
+//        anchors.topMargin: 3
+//        textColor: "white"
+//        style: TextFieldStyle {
+//            placeholderTextColor: "#A8A8A8"
+//            background: Rectangle {
+//                color: "#282828"
+//            }
+//        }
+//    }
 
     TextField {
         id: desc
@@ -77,7 +77,7 @@ Rectangle {
         height: parent.height/5
         anchors.left: parent.left
         anchors.leftMargin: 0
-        anchors.top: when.bottom
+        anchors.top: where.bottom
         anchors.topMargin: 3
         textColor: "white"
         style: TextFieldStyle {
@@ -110,14 +110,12 @@ Rectangle {
         MouseArea {
             anchors.fill: parent
             onClicked: {                
-                Bev.Client.addEvent(desc.displayText);
+                Bev.Client.addEvent(what.displayText, desc.displayText, where.displayText);
                 sv.pop()
                 sv.pop()
                 sv.push(Qt.resolvedUrl("eventMenu.qml"))
             }
         }
     }
-
-
 }
 

@@ -113,7 +113,7 @@ Rectangle {
                     height: infowhat.height + infowhere.height
                     Text {
                         id: infowhat
-                        text: desc
+                        text: title + ", " + loc
                         anchors.horizontalCenter: parent.horizontalCenter
                         font.pointSize: 14
                         font.bold: true
@@ -123,7 +123,7 @@ Rectangle {
 
                     Text {
                         id: infowhere
-                        text: ""
+                        text: desc
                         anchors.horizontalCenter: parent.horizontalCenter
                         anchors.top: infowhat.bottom
                         anchors.topMargin: 0
