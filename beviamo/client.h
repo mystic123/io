@@ -54,15 +54,14 @@ public:
          e.setTitle(title);
          e.setDesc(desc);
          e.setLocation(loc);
-<<<<<<< HEAD
+
          e.setDate(QDateTime::currentDateTime());
          qDebug() << QDateTime::currentDateTime();
          e.setHow_long(1);
-=======
+
 		//   e.setDate(date);
 		 //  e.setHow_long(hl);
 
->>>>>>> 54a3ef17684442652809a7cfe387f67a59850cf2
         _st << MessCodes::create_event;
         _st << e;
         _socket->flush();

@@ -167,11 +167,9 @@ void ConnectionThread::createEvent()
 
 	Event e = Event::readEvent(_socket);
 
-	e.setInvited({});
-	e.setAttending({});
 	e.setInvited(_user->friends());
 	e.setAttending({});
-	auto new_id = _db->createEvent(e);
+	_db->createEvent(e);
 	id_type id = _user->id();
 	delete _user;
 	this->_user = _db->getUserById(id);
