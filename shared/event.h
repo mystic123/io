@@ -10,8 +10,10 @@ class QTcpSocket;
 class Event : public QObject
 {
     Q_OBJECT
-    Q_PROPERTY(QString desc READ desc)
-    Q_PROPERTY(QString event_id READ id)
+	 Q_PROPERTY(QString desc READ desc CONSTANT)
+	 Q_PROPERTY(QString loc READ location CONSTANT)
+	 Q_PROPERTY(QString title READ title CONSTANT)
+	 Q_PROPERTY(qint32 event_id READ id)
 
 public:
 	explicit Event(QObject *parent = 0);

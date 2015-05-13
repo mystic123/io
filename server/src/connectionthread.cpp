@@ -154,7 +154,8 @@ void ConnectionThread::eventData()
 	id_type event_id;
 	_stream >> event_id;
 	Event *e = _db->getEvent(event_id);
-
+	if (!e->id())
+		qDebug() << "ERROR: Event id = 0";
 	_stream << *e;
 	_socket->flush();
 	delete e;
@@ -168,22 +169,12 @@ void ConnectionThread::createEvent()
 
 	e.setInvited({});
 	e.setAttending({});
-	qDebug() << "id:" << e.id();
-	qDebug() << "founder:" << e.founder();
-	qDebug() << "title:" << e.title();
-	qDebug() << "desc:" << e.desc();
-	qDebug() << "location:" << e.location();
-	qDebug() << "date:" << e.date();
-	qDebug() << "howlong:" << e.how_long();
-	qDebug() << "invited:" << e.invited();
-	qDebug() << "attending:" << e.attending();
-	e.setInvited({});
+	e.setInvited(_user->friends());
 	e.setAttending({});
-	_db->createEvent(e);
+	auto new_id = _db->createEvent(e);
 	id_type id = _user->id();
 	delete _user;
 	this->_user = _db->getUserById(id);
-	//qDebug() << _user->eventsAttending() << _user->eventsInvited();
 	sendOK();
 }
 
@@ -193,7 +184,7 @@ void ConnectionThread::updateEvent()
 
 	Event e = Event::readEvent(_socket);
 	_db->updateEvent(e);
-	//qDebug() << e.desc();
+
 	sendOK();
 }
 
@@ -266,29 +257,23 @@ void ConnectionThread::signup()
 	connect(&fb,SIGNAL(userDataReady()),&loop,SLOT(quit()));
 	fb.fetchData();
 	loop.exec();
-	qDebug()<<"po petli";
-	//_user = fb.getUser();
 
 	User u = fb.getUser();
-	qDebug() <<" jeszcze raz:";
-	qDebug() << "id:" << u.id();
-  qDebug() << "email:" << u.email();
-  qDebug() << "first name:" << u.firstName();
-  qDebug() << "last name:" << u.lastName();
-  qDebug() << "gender:" << u.gender();
-  u.setFriends({});
-  u.setEventsAttending({});
-  u.setEventsInvited({});
 
-  //qDebug() <<"jestem";
+  for (auto f : u.friends()) {
+	  if (!_db->getUserById(f)->id()) {
+		  u.delFriend(f);
+	  }
+  }
+
 	_db->createUser(u);
 
-	_stream << u.id();
-	_user = _db->getUserById(u.id());
-	qDebug() << "id: " << _user->id();
-	_socket->flush();
+	id_type id = u.id();
 
-	sendOK();
+	_stream << u.id();
+	_user = _db->getUserById(id);
+
+	_socket->flush();
 }
 
 void ConnectionThread::fbFriendsList()

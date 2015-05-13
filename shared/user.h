@@ -11,6 +11,8 @@ class QTcpSocket;
 class User : public QObject
 {
 	Q_OBJECT
+	Q_PROPERTY(QString fName READ firstName)
+	Q_PROPERTY(QString lName READ lastName)
 
 public:
 	/* constructors */
@@ -45,6 +47,7 @@ public:
 	void addFriend(const QList<id_type>&);
 	void delFriend(id_type);
 	void delFriend(const QList<id_type>&);
+	void inviteToEvent(id_type);
 
 	/* opertators */
 	void operator=(const User&);

@@ -138,15 +138,15 @@ User *DBController::getUserById(const id_type id)
             query.prepare("SELECT friend_id FROM friends WHERE person_id=" + QVariant(id).toString() + ";");
             query.exec();
             while (query.next())
-                    friends.push_back(query.value(0).toInt());
+						  friends.push_back(query.value(0).toLongLong());
 
             /* adding to events and eventsAttended */
             QSqlQuery query1(db());
             query1.prepare("SELECT e_id FROM event WHERE id_founder=" + QVariant(id).toString() + ";");
             query1.exec();
             while (query1.next()){
-                    events.push_back(query1.value(0).toInt());
-                    eventsAtt.push_back(query1.value(0).toInt());
+						  events.push_back(query1.value(0).toLongLong());
+						  eventsAtt.push_back(query1.value(0).toLongLong());
             }
 
             /* adding to eventsAttended */
@@ -154,9 +154,9 @@ User *DBController::getUserById(const id_type id)
             query2.prepare("SELECT id_event, attended FROM invited WHERE id_i_user=" + QVariant(id).toString() + ";");
             query2.exec();
             while (query2.next()){
-                    events.push_back(query2.value(0).toInt());
+						  events.push_back(query2.value(0).toLongLong());
                     if (query2.value(1).toBool())
-                        eventsAtt.push_back(query2.value(0).toInt());
+								eventsAtt.push_back(query2.value(0).toLongLong());
             }
 
             QSqlQuery query3(db());
@@ -166,7 +166,7 @@ User *DBController::getUserById(const id_type id)
             /* making new user and setting all fields */
             User *u = new User;
             while (query3.next()){
-                u->setId(query3.value(0).toInt());
+					 u->setId(id);
                 u->setEmail(query3.value(1).toString());
                 u->setFirstName(query3.value(2).toString());
                 u->setLastName(query3.value(3).toString());
@@ -180,13 +180,14 @@ User *DBController::getUserById(const id_type id)
     } else return nullptr;
 }
 
-int DBController::createEvent(const Event &e)
+id_type DBController::createEvent(const Event &e)
 {
     if (db().isValid()){
         if (db().isOpen()){
             db().transaction();
-            CEInside(e, false);
+				id_type new_id = CEInside(e, false);
             db().commit();
+				return new_id;
         } else return -1;
     } else return -1;
     return 0;
@@ -226,8 +227,8 @@ Event *DBController::getEvent(const id_type id)
             query2.prepare("SELECT id_i_user, attended FROM invited WHERE id_event=" + QVariant(id).toString() + ";");
             query2.exec();
             while (query2.next()){
-                    invited.push_back(query2.value(0).toInt());
-                    if (query2.value(1).toBool()) attending.push_back(query2.value(0).toInt());
+						  invited.push_back(query2.value(0).toLongLong());
+						  if (query2.value(1).toBool()) attending.push_back(query2.value(0).toLongLong());
             }
             /* taking rest of fields */
             QSqlQuery query(db());
@@ -235,13 +236,13 @@ Event *DBController::getEvent(const id_type id)
             query.exec();
             Event *e =  new Event;
             while (query.next()){
-                e->setId(query.value(0).toInt());
+					 e->setId(id);
                 e->setDesc(query.value(1).toString());
-                e->setFounder(query.value(2).toInt());
+					 e->setFounder(query.value(2).toLongLong());
                 e->setTitle(query.value(3).toString());
                 e->setLocation(query.value(4).toString());
                 e->setDate(QDateTime::fromString(query.value(5).toString(), "yyyy-MM-dd'T'hh:mm:ss"));
-                e->setHow_long(query.value(6).toInt());
+					 e->setHow_long(query.value(6).toLongLong());
             }
             e->setAttending(attending);
             e->setInvited(invited);
@@ -252,7 +253,7 @@ Event *DBController::getEvent(const id_type id)
 
 /* private */
 
-void DBController::CEInside(const Event &e, bool isUpdated)
+id_type DBController::CEInside(const Event &e, bool isUpdated)
 {
     id_type id;
     /* protection against sql injection */
@@ -277,7 +278,7 @@ void DBController::CEInside(const Event &e, bool isUpdated)
     query.exec();
 
     if (!isUpdated)
-        while (query.next()) id = query.value(0).toInt();
+		  while (query.next()) id = query.value(0).toLongLong();
     else
         id = e.id();
 
@@ -305,6 +306,7 @@ void DBController::CEInside(const Event &e, bool isUpdated)
         query.exec();
     }
     if(query.isActive()) query.clear();
+	 return id;
 }
 
 void DBController::REInside(const Event &e)

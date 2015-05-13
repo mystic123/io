@@ -15,6 +15,7 @@ User::User(QObject *parent)
 	_eventsInvited = QList<id_type>();
 }
 
+
 User::User(const User &u)
 {
 	this->_id = u.id();
@@ -156,6 +157,12 @@ void User::delFriend(const QList<id_type>& l)
 		delFriend(x);
 	}
 }
+
+void User::inviteToEvent(id_type id)
+{
+	_eventsInvited.append(id);
+}
+
 
 void User::operator=(const User& u)
 {

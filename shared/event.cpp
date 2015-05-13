@@ -25,6 +25,7 @@ Event::Event(const id_type id1, const id_type id2, const QString q, const QList<
 	 _attending = l2;
 }
 
+
 Event::Event(const Event& e): _id(e.id()), _founder(e.founder()),
 	_title(e.desc()), _desc(e.desc()), _location(e.location()),
 	_date(e.date()), _how_long(e.how_long()), _invited(e.invited()),
@@ -132,6 +133,7 @@ void Event::setAttending(const QList<id_type> &attending)
 	_attending = attending;
 }
 
+
 void Event::operator=(const Event& e)
 {
 	this->_id = e.id();
@@ -143,6 +145,7 @@ void Event::operator=(const Event& e)
 	this->_invited = e.invited();
 	this->_attending = e.attending();
 }
+
 
 QDataStream& operator<<(QDataStream& out, const Event& e)
 {

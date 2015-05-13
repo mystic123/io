@@ -79,15 +79,10 @@ void FBsync::fetchUserDataS(QNetworkReply *reply)
 	QJsonDocument jsonResponse = QJsonDocument::fromJson(str.toUtf8());
 	QJsonObject obj = jsonResponse.object();
 	_user.setId(obj.find("id").value().toString().toLongLong());
-	 qDebug() << "id:" << _user.id();
 	_user.setEmail(obj.find("email").value().toString());
-	qDebug() << "email:" << _user.email();
 	_user.setFirstName(obj.find("first_name").value().toString());
-	qDebug() << "first name:" << _user.firstName();
 	_user.setLastName(obj.find("last_name").value().toString());
-	qDebug() << "last name:" << _user.lastName();
 	_user.setGender(obj.find("gender").value().toString().at(0));
-	qDebug() << "gender:" << _user.gender();
 
 	_dataReady = true;
 	if (_friendsReady)
@@ -99,11 +94,9 @@ void FBsync::fetchFriendsS(QNetworkReply *reply)
 	QString str = reply->readAll();
 	QJsonDocument jsonResponse = QJsonDocument::fromJson(str.toUtf8());
 	QJsonArray arr = jsonResponse.object().find("data").value().toArray();
-	//qDebug() << arr;
+
 	for (QJsonValue x : arr) {
-		//qDebug() << x.toObject().value("id");
-		//_user.addFriend(x.toObject().value("id").toString().toULongLong());
-		qDebug() << "added:" << x.toObject().value("id").toString().toULongLong();
+		_user.addFriend(x.toObject().value("id").toString().toULongLong());
 	}
 
 	_friendsReady = true;

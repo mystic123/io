@@ -21,7 +21,7 @@ public:
     User* getUserById(const id_type);
 
     /* Event controller */
-    int createEvent(const Event &e);
+	 id_type createEvent(const Event &e);
     int updateEvent(const Event &e);
     int removeEvent(const Event &e);
     Event* getEvent(const id_type);
@@ -29,7 +29,7 @@ public:
 private:
     QSqlDatabase _db;
     void RUInside(const User &u);
-    void CEInside(const Event &e, bool isUpdated);
+	 id_type CEInside(const Event &e, bool isUpdated);
     void REInside(const Event &e);
 };
 
