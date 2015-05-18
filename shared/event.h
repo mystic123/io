@@ -28,9 +28,9 @@ public:
 	id_type founder() const;
 	QString title() const;
 	QString desc() const;
-    QString location() const;
-    QDateTime date() const;
-    qint64 how_long() const;
+	QString location() const;
+	QDateTime date() const;
+	qint64 how_long() const;
 	QList<id_type> invited() const;
 	QList<id_type> attending() const;
 
@@ -39,11 +39,14 @@ public:
 	void setFounder(const id_type &founder);
 	void setTitle(const QString &title);
 	void setDesc(const QString &desc);
-    void setLocation(const QString &location);
+	void setLocation(const QString &location);
 	void setDate(const QDateTime &date);
-    void setHow_long(const qint64 &how_long);
+	void setHow_long(const qint64 &how_long);
 	void setInvited(const QList<id_type> &invited);
 	void setAttending(const QList<id_type> &attending);
+
+	void addAttendant(id_type);
+	void addInvited(id_type);
 
 	/* opertators */
 	void operator=(const Event&);

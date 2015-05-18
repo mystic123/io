@@ -133,6 +133,16 @@ void Event::setAttending(const QList<id_type> &attending)
 	_attending = attending;
 }
 
+void Event::addAttendant(id_type id)
+{
+	_attending.append(id);
+}
+
+void Event::addInvited(id_type id)
+{
+	_invited.append(id);
+}
+
 
 void Event::operator=(const Event& e)
 {

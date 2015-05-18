@@ -197,9 +197,12 @@ void ConnectionThread::inviteEvent()
 	id_type id;
 	_stream >> id;
 
-	this->_user->inviteToEvent(id);
+	Event *e = _db->getEvent(id);
 
-	_db->updateUser(*_user);
+	e->addInvited(_user->id());
+
+	_db->updateEvent(*e);
+
 	id_type uid = _user->id();
 	delete _user;
 	_user = _db->getUserById(uid);
@@ -217,9 +220,13 @@ void ConnectionThread::joinEvent()
 	id_type id;
 	_stream >> id;
 
-	this->_user->joinEvent(id);
+	Event *e = _db->getEvent(id);
 
-	_db->updateUser(*_user);
+	e->addAttendant(_user->id());
+
+	_db->updateEvent(*e);
+
+	delete e;
 	id_type uid = _user->id();
 	delete _user;
 	_user = _db->getUserById(uid);
