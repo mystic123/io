@@ -160,7 +160,14 @@ void User::delFriend(const QList<id_type>& l)
 
 void User::inviteToEvent(id_type id)
 {
-	_eventsInvited.append(id);
+	if (!_eventsAttending.contains(id))
+		_eventsInvited.append(id);
+}
+
+void User::joinEvent(id_type id)
+{
+	if (!_eventsAttending.contains(id))
+		_eventsAttending.append(id);
 }
 
 

@@ -120,6 +120,8 @@ void testRemoveEvent(){
     }
 }
 
+#include <QSqlQuery>
+
 int main(int argc, char *argv[])
 {
     /* przed uzyciem
@@ -129,7 +131,33 @@ int main(int argc, char *argv[])
     testCreateEvent();
     testUpdateEvent();
 	 */
+/*
+	QSqlDatabase db = QSqlDatabase::addDatabase("QPSQL");
 
+		 db.setHostName("127.0.0.1");
+		 db.setDatabaseName("beviamo");
+		 db.setUserName("beviamo");
+		 db.setPassword("beviamo");
+
+		 if(!db.open())
+		 {
+			  qDebug() << "Database cannot be opened";
+		 }
+
+							 //Unitl here no errors
+
+	QString consulta = "Insert into productos values ('25','25','25);";
+
+
+		 //db.transaction();
+
+		 QSqlQuery query(db);
+		 query.prepare(consulta);     //Here tried to pass directly the string with same results
+		 query.exec();                //Even omitted .prepare but nothing
+		 query.finish();
+
+		 qDebug() << "rows:" << query.numRowsAffected();
+*/
 	QCoreApplication a(argc,argv);
 	Server server;
 	server.startServer();

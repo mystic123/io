@@ -190,16 +190,40 @@ void ConnectionThread::inviteEvent()
 {
 	qDebug()<<"inviteEvent";
 
-	_socket->waitForReadyRead();
+	while (_socket->bytesAvailable() < sizeof(id_type)) {
+		_socket->waitForReadyRead(REFRESH_TIME);
+	}
 
-	QList<id_type> list;
-	_stream >> list;
+	id_type id;
+	_stream >> id;
 
+	this->_user->inviteToEvent(id);
+
+	_db->updateUser(*_user);
+	id_type uid = _user->id();
+	delete _user;
+	_user = _db->getUserById(uid);
+	sendOK();
 }
 
 void ConnectionThread::joinEvent()
 {
 	qDebug()<<"joinEvent";
+
+	while (_socket->bytesAvailable() < sizeof(id_type)) {
+		_socket->waitForReadyRead(REFRESH_TIME);
+	}
+
+	id_type id;
+	_stream >> id;
+
+	this->_user->joinEvent(id);
+
+	_db->updateUser(*_user);
+	id_type uid = _user->id();
+	delete _user;
+	_user = _db->getUserById(uid);
+	sendOK();
 }
 
 void ConnectionThread::addFriend()
@@ -210,9 +234,9 @@ void ConnectionThread::addFriend()
 	_stream >> id;
 	this->_user->addFriend(id);
 	_db->updateUser(*_user);
-	id_type mid = _user->id();
+	id_type uid = _user->id();
 	delete _user;
-	_user = _db->getUserById(mid);
+	_user = _db->getUserById(uid);
 	sendOK();
 }
 

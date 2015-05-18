@@ -48,6 +48,7 @@ public:
 	void delFriend(id_type);
 	void delFriend(const QList<id_type>&);
 	void inviteToEvent(id_type);
+	void joinEvent(id_type);
 
 	/* opertators */
 	void operator=(const User&);
