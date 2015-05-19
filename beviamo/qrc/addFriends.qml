@@ -6,6 +6,7 @@ import Bev 1.0 as Bev
 Rectangle {
     id: addfriends
     color: "#101010"
+
     Image {
         id: icon
         anchors.top: parent.top
@@ -19,46 +20,44 @@ Rectangle {
 
         Component {
             id: listDelegate
-            Rectangle {
-                id: wrapper
-                height: eventmenu.height/10
-                width: eventmenu.width
-                color: "#383838"
-                Rectangle {
-                    color: "#383838"
-                    anchors.verticalCenter: parent.verticalCenter
-                    width: parent.width
-                    height: parent.height * 1 / 20
 
-                    Text {
-                        id: infowhat
-                        text: fName + " " + lName
-                        anchors.horizontalCenter: parent.horizontalCenter
-                        font.pointSize: 14
-                        font.bold: true
-                        font.family: "Helvetica"
-                        color: "white"
-                    }
+            Rectangle {
+                width: friendsmenu.width
+                height: friendsmenu.height / 10
+                color: "#383838"
+
+                Text {
+                    id: who
+                    text: "TEST"
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    anchors.verticalCenter: parent.verticalCenter
+                    font.pointSize: 14
+                    font.bold: true
+                    font.family: "Helvetica"
+                    color: "white"
+                }
+
+                Rectangle {
+                    anchors.top: parent.top
+                    anchors.topMargin: parent.height / 4
+                    anchors.right: parent.right
+                    anchors.rightMargin: parent.height / 4
+                    width: parent.height / 2
+                    height: parent.height / 2
+                    color: "green"
 
                     MouseArea {
-                        anchors.right: parent.right
-                        anchors.rightMargin: parent.height / 2
-                        width: parent.height / 2
-                        height: parent.height / 2
-
-                        Rectangle {
-                            anchors.fill: parent
-                            color: green
-                        }
-
+                        anchors.fill: parent
                         onClicked: {
-                            Bev.Client.addFriend(user_id)
+                          console.log("dodaje friends")
+                          Bev.Client.addFriend(user_id)
+                          sv.pop()
+                          sv.push(Qt.resolvedUrl("friendsMenu.qml"))
                         }
                     }
-
                 }
-            }
-        }
+           }
+       }
 
         spacing: 3
         highlightRangeMode: ListView.ApplyRange
@@ -71,4 +70,3 @@ Rectangle {
     }
 
 }
-

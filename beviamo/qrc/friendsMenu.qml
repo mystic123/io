@@ -1,4 +1,5 @@
 import QtQuick 2.0
+import Bev 1.0 as Bev
 
 Rectangle {
     id: friendsmenu
@@ -38,48 +39,44 @@ Rectangle {
 
         Component {
             id: listDelegate
-            Rectangle {
-                id: wrapper
-                height: eventmenu.height/10
-                width: eventmenu.width
-                color: "#383838"
-                Rectangle {
-                    color: "#383838"
-                    anchors.verticalCenter: parent.verticalCenter
-                    width: parent.width
-                    height: parent.height * 1 / 20
 
-                    Text {
-                        id: who
-                        text: fName + " " + lName
-                        anchors.horizontalCenter: parent.horizontalCenter
-                        font.pointSize: 14
-                        font.bold: true
-                        font.family: "Helvetica"
-                        color: "white"
-                    }
+            Rectangle {
+                width: friendsmenu.width
+                height: friendsmenu.height / 10
+                color: "#383838"
+
+                Text {
+                    id: who
+                    text: fName + " " + lName + user_id
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    anchors.verticalCenter: parent.verticalCenter
+                    font.pointSize: 14
+                    font.bold: true
+                    font.family: "Helvetica"
+                    color: "white"
+                }
+
+                Rectangle {
+                    anchors.top: parent.top
+                    anchors.topMargin: parent.height / 4
+                    anchors.right: parent.right
+                    anchors.rightMargin: parent.height / 4
+                    width: parent.height / 2
+                    height: parent.height / 2
+                    color: "#FF0033"
 
                     MouseArea {
-                        anchors.right: parent.right
-                        anchors.rightMargin: parent.height / 2
-                        width: parent.height / 2
-                        height: parent.height / 2
-
-                        Rectangle {
-                            anchors.fill: parent
-                            color: red
-                        }
-
+                        anchors.fill: parent
                         onClicked: {
-                            Bev.Client.addFriend(user_id)
+                            console.log("usuwam friend")
+                            Bev.Client.delFriend(user_id);
                             sv.pop()
                             sv.push(Qt.resolvedUrl("friendsMenu.qml"))
                         }
                     }
-
                 }
-            }
-        }
+           }
+       }
 
         spacing: 3
         highlightRangeMode: ListView.ApplyRange

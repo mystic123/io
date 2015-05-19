@@ -13,6 +13,7 @@ class User : public QObject
 	Q_OBJECT
 	Q_PROPERTY(QString fName READ firstName)
 	Q_PROPERTY(QString lName READ lastName)
+    Q_PROPERTY(QString user_id READ id_string)
 
 public:
 	/* constructors */
@@ -24,6 +25,11 @@ public:
 
 	/* getters */
 	id_type id() const;
+    QString id_string() const {
+        QString ret = QString::number(id());
+        qDebug() << ret;
+        return ret;
+    }
 	QString email() const;
 	QString firstName() const;
 	QString lastName() const;

@@ -5,7 +5,7 @@
 Client::Client(QObject *parent) : QObject(parent)
 {
     _socket = new QTcpSocket();
-    _socket->connectToHost("10.20.4.165", 10777);
+    _socket->connectToHost("localhost", 10776);
     _socket->waitForConnected();
     qDebug() << _socket->state();
     _st.setDevice(_socket);
@@ -36,6 +36,8 @@ Event* Client::getEvent(id_type id)
 
     Event *e = new Event();
     *e = Event::readEvent(_socket);
+    qDebug() << "ID POBIERAM" << e->id();
+    qDebug() << "DODANI" << e->attending();
     return e;
 }
 

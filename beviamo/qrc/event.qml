@@ -21,7 +21,7 @@ Rectangle {
             height: info1.height+ info2.height
             Text {
                 id: info1
-                text: "Dota, by Andrew"
+                text: Bev.Client.eventTitle()
                 anchors.horizontalCenter: parent.horizontalCenter
                 font.pointSize: 16
                 font.bold: true
@@ -31,7 +31,7 @@ Rectangle {
 
             Text {
                 id: info2
-                text: "gdzie chcesz, 21:00"
+                text: Bev.Client.eventLoc()
                 anchors.horizontalCenter: parent.horizontalCenter
                 anchors.top: info1.bottom
                 anchors.topMargin: 0
@@ -119,7 +119,7 @@ Rectangle {
                 color: "#101010"
                 Text {
                     id: infowhat
-                    text: modelData
+                    text: fName + " " + lName
                     anchors.horizontalCenter: parent.horizontalCenter
                     font.pointSize: 14
                     font.bold: true
@@ -132,11 +132,8 @@ Rectangle {
         ListModel {
             id: listModel
 
-//            ListElement { name: "Andrzej" }
-//            ListElement { name: "Pszemek" }
-//            ListElement { name: "Bartek" }
-//            ListElement { name: "Maria" }
-//            ListElement { name: "Leszek" }
+            ListElement { name: "Andrzej" }
+            ListElement { name: "Pszemek" }
         }
 
         spacing: 3
@@ -146,7 +143,8 @@ Rectangle {
                 - descheader.height - description.height - 20
         anchors.top: joined.bottom
         anchors.topMargin: 5
-        model: listModel
+        //model: listModel
+        model: attendingList
         delegate: listDelegate
     }
 
@@ -168,6 +166,15 @@ Rectangle {
             text: qsTr("JOIN")
             anchors.horizontalCenter: parent.horizontalCenter
             anchors.verticalCenter: parent.verticalCenter
+        }
+
+        MouseArea {
+            anchors.fill: parent
+            onClicked: {
+                Bev.Client.joinEvent();
+                sv.pop();
+                sv.push(Qt.resolvedUrl("event.qml"));
+            }
         }
     }
 }

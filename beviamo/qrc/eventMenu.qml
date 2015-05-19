@@ -123,7 +123,7 @@ Rectangle {
 
                     Text {
                         id: infowhere
-                        text: desc
+                        text: desc + " "
                         anchors.horizontalCenter: parent.horizontalCenter
                         anchors.top: infowhat.bottom
                         anchors.topMargin: 0
@@ -137,6 +137,7 @@ Rectangle {
                         anchors.fill: parent
                         onClicked: {
                             Bev.Client.chosenEventModel(event_id)
+                            Bev.Client.eventAttendingRefresh()
                             sv.push(Qt.resolvedUrl("event.qml"))
                         }
                     }

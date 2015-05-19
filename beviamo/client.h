@@ -37,15 +37,23 @@ public:
 //        for (id_type id: e.attending()) {
 //            r.append(getUser(id)->NICK);
 //        }
-//     }
+//     }<
 
      Q_INVOKABLE void chosenEventModel(qint32 id) {
          id_type id_tmp = id;
-         chosenEvent = *getEvent(id_tmp);
+         chosenEventId = id_tmp;
      }
 
      Q_INVOKABLE QString eventDesc() {
          return chosenEvent.desc();
+     }
+
+     Q_INVOKABLE QString eventTitle() {
+         return chosenEvent.title();
+     }
+
+     Q_INVOKABLE QString eventLoc() {
+         return chosenEvent.location();
      }
 
      Q_INVOKABLE void addEvent(QString title, QString desc, QString loc) {
@@ -54,13 +62,8 @@ public:
          e.setTitle(title);
          e.setDesc(desc);
          e.setLocation(loc);
-
          e.setDate(QDateTime::currentDateTime());
-         qDebug() << QDateTime::currentDateTime();
          e.setHow_long(1);
-
-		//   e.setDate(date);
-		 //  e.setHow_long(hl);
 
         _st << MessCodes::create_event;
         _st << e;
@@ -115,16 +118,46 @@ public:
 
         for (id_type id: friends) {
          flist.append(this->getFriend(id));
+         qDebug() << "w refresh" << this->getFriend(id)->id();
         }
 
         engine->rootContext()->setContextProperty("friendsList", QVariant::fromValue(flist));
     }
 
-    Q_INVOKABLE void delFriend(qint32 id) {
-        qDebug() << "usuwam: " << id;
+    Q_INVOKABLE void eventAttendingRefresh() {
+        chosenEvent = *this->getEvent(chosenEventId);
+        QList<QObject*> names;
+        for(id_type id: chosenEvent.attending()) {
+            names.append(this->getFriend(id));
+        }
+
+        engine->rootContext()->setContextProperty("attendingList", QVariant::fromValue(names));
+    }
+
+    Q_INVOKABLE void joinEvent() {
+        _st << MessCodes::join_event;
+        _socket->flush();
+        qDebug() << "dodaje sie do eventu" << chosenEvent.id();
+        _st << chosenEvent.id();
+        _socket->flush();
+        _socket->waitForBytesWritten();
+
+        while (_socket->bytesAvailable() < sizeof(qint32)) {
+            _socket->waitForReadyRead(1);
+        }
+
+        qint32 ok;
+        _st >> ok;
+
+        eventAttendingRefresh();
+     }
+
+    Q_INVOKABLE void delFriend(QString id) {
+        id_type id_tmp = id.toLongLong();
+        qDebug() << "usuwam: " << id_tmp;
         _st << MessCodes::del_friend;
         _socket->flush();
-        _st << id;
+        _st << id_tmp;
         _socket->flush();
         _socket->waitForBytesWritten();
 
@@ -169,6 +202,7 @@ public:
 
          User *u = new User();
          *u = User::readUser(_socket);
+         qDebug() << "GET FRIEND ID" << u->id();
          return u;
      }
 
@@ -176,8 +210,8 @@ public:
          this->connect();
          this->getUser(my_id);
          EventsRefresh();
-         //FriendListRefresh();
-         //FbFriendListRefresh();
+         FriendListRefresh();
+        // FbFriendListRefresh();
      }
 
      Q_INVOKABLE void set_logout_url() {
@@ -230,6 +264,7 @@ private:
     QQmlApplicationEngine *engine;
     QList<id_type> availableEvents;
     User* user;
+    id_type chosenEventId;
     Event chosenEvent;
     QString token;
 };

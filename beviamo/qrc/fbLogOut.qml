@@ -8,14 +8,14 @@ Rectangle {
     WebView {
         id: webview
         z: 1
-        width: 640
-        height: 480
         anchors.fill: parent
         url: Qt.resolvedUrl(logoutUrl)
 
         onLoadingChanged: {
-                console.log("WYWOLUJE")
+            if (loading == false) {
+                console.log("wywolane")
                 sv.push(Qt.resolvedUrl("FacebookView.qml"));
+            }
         }
     }
 

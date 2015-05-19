@@ -30,6 +30,7 @@ User::User(const User &u)
 
 User::User(const id_type id, const QList<id_type>& f, const QList<id_type>& e1, const QList<id_type>& e2)
 {
+
     _id = id;
     _friends = f;
     _eventsInvited = e1;
