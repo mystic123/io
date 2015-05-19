@@ -168,7 +168,8 @@ void ConnectionThread::createEvent()
 	Event e = Event::readEvent(_socket);
 
 	e.setInvited(_user->friends());
-	e.setAttending({});
+
+	e.addAttendant(_user->id());
 	_db->createEvent(e);
 	id_type id = _user->id();
 	delete _user;
@@ -237,6 +238,10 @@ void ConnectionThread::addFriend()
 {
 	qDebug()<<"addFriend";
 
+	while (_socket->bytesAvailable() < sizeof(id_type)) {
+		_socket->waitForReadyRead(REFRESH_TIME);
+	}
+
 	id_type id;
 	_stream >> id;
 	this->_user->addFriend(id);
@@ -250,6 +255,10 @@ void ConnectionThread::addFriend()
 void ConnectionThread::delFriend()
 {
 	qDebug()<<"delFriend";
+
+	while (_socket->bytesAvailable() < sizeof(id_type)) {
+		_socket->waitForReadyRead(REFRESH_TIME);
+	}
 
 	id_type id;
 	_stream >> id;
