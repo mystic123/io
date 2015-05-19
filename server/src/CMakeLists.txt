@@ -2,12 +2,14 @@ set (SOURCES
 	dbcontroller.cpp
 	connectionthread.cpp
 	server.cpp
+	fbsync.cpp
 	main.cpp
 )
 
 set (HEADERS
 	dbcontroller.h
 	connectionthread.h
+	fbsync.h
 	server.h
 )
 
@@ -16,6 +18,6 @@ set (HEADERS
 	
 add_executable(BeviamoServer ${SOURCES})# ${RESOURCES_RCC})
 
-qt5_use_modules(BeviamoServer Sql)
+qt5_use_modules(BeviamoServer Sql Network)
 
 target_link_libraries(BeviamoServer SharedLib)

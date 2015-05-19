@@ -2,14 +2,14 @@ set (HEADERS
    global.h
    user.h
    event.h
-   fbsync.h
+    comment.h
 )
 
 set (SOURCES
    global.cpp
    user.cpp
    event.cpp
-   fbsync.cpp
+    comment.cpp
 )
 
 add_library(SharedLib ${SOURCES})
