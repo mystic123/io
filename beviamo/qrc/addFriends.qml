@@ -22,13 +22,13 @@ Rectangle {
             id: listDelegate
 
             Rectangle {
-                width: friendsmenu.width
-                height: friendsmenu.height / 10
+                width: addfriends.width
+                height: addfriends.height / 10
                 color: "#383838"
 
                 Text {
                     id: who
-                    text: "TEST"
+                    text: fName + " " + lName
                     anchors.horizontalCenter: parent.horizontalCenter
                     anchors.verticalCenter: parent.verticalCenter
                     font.pointSize: 14
@@ -51,6 +51,7 @@ Rectangle {
                         onClicked: {
                           console.log("dodaje friends")
                           Bev.Client.addFriend(user_id)
+                          sv.pop()
                           sv.pop()
                           sv.push(Qt.resolvedUrl("friendsMenu.qml"))
                         }

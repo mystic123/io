@@ -99,12 +99,31 @@ public:
 
         _st << MessCodes::fb_friends_list;
         _socket->flush();
+        _st << (qint32) token.size();
+        _st << token;
+        _socket->flush();
+        _socket->waitForBytesWritten();
+
+        while (_socket->bytesAvailable() < sizeof(qint32)) {
+            _socket->waitForReadyRead(REFRESH_TIME);
+        }
+
+        qint32 size;
+        _st >> size;
+
+        while (_socket->bytesAvailable() < size * sizeof(id_type)) {
+            _socket->waitForReadyRead(REFRESH_TIME);
+        }
         _st >> fbfriends;
+        qDebug()<<fbfriends;
 
         QList<QObject*> flist;
 
         for (id_type id: fbfriends) {
-            flist.append(this->getFriend(id));
+            qDebug() << "SA JAKIES?";
+            User *tmp = this->getFriend(id);
+            if (tmp != nullptr)
+                flist.append(tmp);
         }
 
         engine->rootContext()->setContextProperty("facebookFriendsList", QVariant::fromValue(flist));
@@ -170,13 +189,15 @@ public:
 
         this->getUser(my_id);
         FriendListRefresh();
+        FbFriendListRefresh();
      }
 
-    Q_INVOKABLE void addFriend(qint32 id) {
-        qDebug() << "dodaje: " << id;
+    Q_INVOKABLE void addFriend(QString id) {
+        id_type id_tmp = id.toLongLong();
+        qDebug() << "dodaje: " << id_tmp;
         _st << MessCodes::add_friend;
         _socket->flush();
-        _st << id;
+        _st << id_tmp;
         _socket->flush();
         _socket->waitForBytesWritten();
 
@@ -203,7 +224,10 @@ public:
          User *u = new User();
          *u = User::readUser(_socket);
          qDebug() << "GET FRIEND ID" << u->id();
-         return u;
+         if (u->id() == 0)
+             return nullptr;
+         else
+            return u;
      }
 
      Q_INVOKABLE void login() {
@@ -211,7 +235,7 @@ public:
          this->getUser(my_id);
          EventsRefresh();
          FriendListRefresh();
-        // FbFriendListRefresh();
+         FbFriendListRefresh();
      }
 
      Q_INVOKABLE void set_logout_url() {

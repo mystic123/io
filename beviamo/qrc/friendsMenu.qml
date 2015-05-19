@@ -47,7 +47,7 @@ Rectangle {
 
                 Text {
                     id: who
-                    text: fName + " " + lName + user_id
+                    text: fName + " " + lName
                     anchors.horizontalCenter: parent.horizontalCenter
                     anchors.verticalCenter: parent.verticalCenter
                     font.pointSize: 14

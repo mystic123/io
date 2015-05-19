@@ -14,10 +14,10 @@ DBController::DBController(qintptr id){
 	db.setPassword("beviamo");
 	db.setDatabaseName("mystic123_beviamo");
 
-//	db.setHostName("localhost");
-//	 db.setUserName("beviamo");
-//	 db.setPassword("beviamo");
-//	 db.setDatabaseName("beviamo");
+    db.setHostName("localhost");
+     db.setUserName("siemin93");
+     db.setPassword("siemin93");
+     db.setDatabaseName("bev");
 
 /*to change*/
 /*

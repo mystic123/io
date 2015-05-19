@@ -341,18 +341,24 @@ void ConnectionThread::fbFriendsList()
 	loop.exec();
 
 	QList<id_type> fb_list = fb.friendsList();
-
+    qDebug() << "facebookiw:" << fb.friendsList();
 	QList<id_type> user_list = _user->friends();
 
 	QSet<id_type> fb_set = QSet<id_type>::fromList(fb_list);
-
+    QSet<id_type> fb_set_tmp = QSet<id_type>::fromList(fb_list);
+qDebug() << "facebookiw set :" << fb_set;
 	QSet<id_type> user_set = QSet<id_type>::fromList(user_list);
+    qDebug() << "user_ser:" << user_set;
+    QSet<id_type> intersect = fb_set_tmp.intersect(user_set);
+qDebug() << "intersect:" << intersect;
+    fb_set.subtract(intersect);
+    qDebug() << fb_set;
 
-	QSet<id_type> intersect = fb_set.intersect(user_set);
+    auto fb_list_r = fb_set.toList();
 
-	fb_set = fb_set.subtract(intersect);
-
-	_stream << fb_set.toList();
+    _stream << fb_list_r.size();
+    _socket->waitForBytesWritten();
+    _stream << fb_set.toList();
 	_socket->flush();
 }
 
