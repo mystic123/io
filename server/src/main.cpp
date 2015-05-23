@@ -2,9 +2,10 @@
 #include <iostream>
 #include "server.h"
 #include "fbsync.h"
-
+#include <QSqlQuery>
 #include "user.h"
 #include "event.h"
+#include "comment.h"
 #include "dbcontroller.h"
 #include "QDebug"
 
@@ -50,7 +51,7 @@ void testUpdateEvent(){
         e.setId(i);
         e.setFounder(i);
         e.setTitle("Wydarzenie numer " + QVariant(i).toString());
-        e.setDesc("Opis updated  "+ QVariant(i).toString());
+        e.setDesc("Opis updated "+ QVariant(i).toString());
         e.setDate(QDateTime(QDate(2015+i,7,i+1), QTime(i,0,i)));
         e.setInvited({});
         e.setAttending({});
@@ -80,7 +81,7 @@ void testUpdateUser(){
         User u;
         u.setId(i);
         u.setEmail("user " + QVariant(i).toString() + "@bla.pl");
-        u.setFirstName("po update  "+ QVariant(i).toString());
+        u.setFirstName("po update "+ QVariant(i).toString());
         u.setLastName("po update " + QVariant(i).toString());
         u.setGender('f');
         u.setFriends({1,2,3,4,5});
@@ -92,7 +93,7 @@ void testUpdateUser(){
         User u;
         u.setId(i);
         u.setEmail("user " + QVariant(i).toString() + "@bla.pl");
-        u.setFirstName("po update  "+ QVariant(i).toString());
+        u.setFirstName("po update "+ QVariant(i).toString());
         u.setLastName("drugie imie " + QVariant(i).toString());
         u.setGender('f');
         u.setFriends({});
@@ -103,6 +104,7 @@ void testUpdateUser(){
 }
 
 void testRemoveUser(){
+     qDebug() << QString("removeUser");
     DBController d(122);
     for(qint16 i = 1; i<= 20; i++){
         User u;
@@ -112,6 +114,7 @@ void testRemoveUser(){
 }
 
 void testRemoveEvent(){
+    qDebug() << QString("removeEvent");
     DBController d(142);
     for(qint16 i = 1; i<= 20; i++){
         Event e;
@@ -120,47 +123,94 @@ void testRemoveEvent(){
     }
 }
 
-#include <QSqlQuery>
+void testCreateComment(){
+    qDebug() << QString("createComment");
+   DBController d(1312);
+   for (qint16 i = 1; i<= 20; i++){
+        Comment c;
+        c.setEvent(i);
+        c.setAuthorId(i);
+        c.setContent("tutaj komentuje");
+        c.setDate(QDateTime(QDate(2015+i,7,i+1), QTime(i,0,i)));
+        d.createComment(c);
+   }
+}
+
+void testUpdateComment(){
+    qDebug() << QString("updateComment");
+    DBController d(7434);
+    for(qint16 i = 1; i<= 20; i++){
+        Comment c;
+        c.setId(i);
+        c.setEvent(i);
+        c.setAuthorId(i);
+        c.setContent("tutaj komentuje po update");
+        c.setDate(QDateTime(QDate(2015+i,7,i+1), QTime(i,0,i)));
+        d.updateComment(c);
+   }
+}
+
+void testRemoveComment(){
+    qDebug() << QString("removeComment");
+    DBController d(1712);
+    for(qint16 i = 1; i<= 5; i++){
+        Comment c;
+        c.setId(i);
+        d.removeComment(c);
+    }
+}
+
+void testGetEvent(){
+   qDebug() << QString("getEvent");
+   DBController d(1792);
+   for(qint16 i = 1; i<= 20; i++){
+       Event *e;
+       e = d.getEvent(i);
+       if (e->desc() != ("Opis updated " + QVariant(i).toString())){
+           qDebug() << "getEvent desc error";
+           exit(0);
+       }
+   }
+}
+
+void testGetUser(){
+   qDebug() << QString("getUser");
+   DBController d(1392);
+   for(qint16 i = 6; i<= 20; i++){
+       User *u;
+       u = d.getUserById(i);
+       if (u->firstName() != ("po update " + QVariant(i).toString())){
+           qDebug() << u->firstName();
+           qDebug() << "po update " + QVariant(i).toString();
+           qDebug() << "getUser firstName error";
+           exit(0);
+       }
+   }
+}
 
 int main(int argc, char *argv[])
 {
-    /* przed uzyciem
-	  * wyczyscic baze danych
-    testCreateUser();
+    /*   przed uzyciem wyczyscic baze danych
+      *  /io/db/removeDB.sql
+      *  /io/db/createDB.sql
+    */
+
+    /*testCreateUser();
     testUpdateUser();
     testCreateEvent();
+    testCreateComment();
+    testUpdateComment();
     testUpdateEvent();
-	 */
-/*
-	QSqlDatabase db = QSqlDatabase::addDatabase("QPSQL");
-
-		 db.setHostName("127.0.0.1");
-		 db.setDatabaseName("beviamo");
-		 db.setUserName("beviamo");
-		 db.setPassword("beviamo");
-
-		 if(!db.open())
-		 {
-			  qDebug() << "Database cannot be opened";
-		 }
-
-							 //Unitl here no errors
-
-	QString consulta = "Insert into productos values ('25','25','25);";
+    testGetEvent();
+    testGetUser();*/
 
 
-		 //db.transaction();
+    /*testRemoveEvent();
+    testRemoveUser();*/
 
-		 QSqlQuery query(db);
-		 query.prepare(consulta);     //Here tried to pass directly the string with same results
-		 query.exec();                //Even omitted .prepare but nothing
-		 query.finish();
-
-		 qDebug() << "rows:" << query.numRowsAffected();
-*/
-	QCoreApplication a(argc,argv);
+    /*QCoreApplication a(argc,argv);
 	Server server;
 	server.startServer();
-	return a.exec();
+    return a.exec();*/
 }
 

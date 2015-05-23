@@ -31,6 +31,7 @@ public:
 	QString location() const;
 	QDateTime date() const;
 	qint64 how_long() const;
+    QList<id_type> comments() const;
 	QList<id_type> invited() const;
 	QList<id_type> attending() const;
 
@@ -42,6 +43,7 @@ public:
 	void setLocation(const QString &location);
 	void setDate(const QDateTime &date);
 	void setHow_long(const qint64 &how_long);
+    void setComments(const QList<id_type> &comments);
 	void setInvited(const QList<id_type> &invited);
 	void setAttending(const QList<id_type> &attending);
 
@@ -66,6 +68,7 @@ private:
     QString _location;
 	QDateTime _date;
     qint64 _how_long;
+    QList<id_type> _comments;
 	QList<id_type> _invited;
 	QList<id_type> _attending;
 	/* Location */

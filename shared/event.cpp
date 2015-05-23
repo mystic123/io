@@ -78,6 +78,11 @@ qint64 Event::how_long() const
     return _how_long;
 }
 
+QList<id_type> Event::comments() const
+{
+    return _comments;
+}
+
 QList<id_type> Event::invited() const
 {
 	return _invited;
@@ -121,6 +126,11 @@ void Event::setDate(const QDateTime &date)
 void Event::setHow_long(const qint64 &how_long)
 {
     _how_long = how_long;
+}
+
+void Event::setComments(const QList<id_type> &comments)
+{
+    _comments = comments;
 }
 
 void Event::setInvited(const QList<id_type> &invited)

@@ -4,7 +4,7 @@
 #include <QSqlDatabase>
 #include "event.h"
 #include "user.h"
-
+#include "comment.h"
 class DBController
 {
 public:
@@ -26,11 +26,14 @@ public:
     int removeEvent(const Event &e);
     Event* getEvent(const id_type);
 
+    /* Comment controller */
+    int createComment(const Comment &c);
+    int updateComment(const Comment &c);
+    int removeComment(const Comment &c);
+
+
 private:
     QSqlDatabase _db;
-    void RUInside(const User &u);
-	 id_type CEInside(const Event &e, bool isUpdated);
-    void REInside(const Event &e);
 };
 
 #endif // DBCONTROLLER_H
