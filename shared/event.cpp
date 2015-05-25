@@ -179,7 +179,7 @@ void Event::operator=(const Event& e)
 	this->_attending = e.attending();
 }
 
-bool Event::operator==(const Event &e)
+bool Event::operator==(const Event &e) const
 {
 	if (_id != e.id()) {
 		return false;
@@ -193,7 +193,8 @@ bool Event::operator==(const Event &e)
 	if (_desc != e.desc()) {
 		return false;
 	}
-	if (_date != e.date()) {
+	/* comparing dates */
+	if (_date.toString("yyyy-MM-dd'T'hh:mm:ss").compare(e.date().toString("yyyy-MM-dd'T'hh:mm:ss")) != 0) {
 		return false;
 	}
 	if (_location != e.location()) {
@@ -201,7 +202,7 @@ bool Event::operator==(const Event &e)
 	}
 
 	QSet<id_type> s1 = QSet<id_type>::fromList(_comments);
-	QSet<id_type> s2 = QSet<id_type>::fromList(_comments);
+	QSet<id_type> s2 = QSet<id_type>::fromList(e.comments());
 
 	if (s1 != s2) {
 		return false;

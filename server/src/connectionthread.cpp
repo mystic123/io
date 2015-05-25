@@ -104,6 +104,7 @@ void ConnectionThread::login()
 	id_type user_id;
 	_stream >> user_id;
 	_user = _db->getUserById(user_id);
+	qDebug() << "logged: " << _user->firstName() << _user->lastName();
 }
 
 void ConnectionThread::signup()
@@ -162,11 +163,9 @@ void ConnectionThread::userData()
 	_stream >> user_id;
 	if (user_id == _user->id()) {
 		_stream << *_user;
-		qDebug() << _user->eventsAttending() << _user->eventsInvited();
 	}
 	else {
 		User *u = _db->getUserById(user_id);
-		qDebug() << "tu" << u->eventsAttending() << u->eventsInvited();
 		_stream << *u;
 		delete u;
 	}
@@ -217,9 +216,14 @@ void ConnectionThread::createEvent()
 
 	Event e = Event::readEvent(_socket);
 
-	e.setInvited(_user->friends());
+
+	QList<id_type> l = _user->friends();
+	l.prepend(_user->id());
+
+	e.setInvited(l);
 
 	e.addAttendant(_user->id());
+
 	_db->createEvent(e);
 	id_type id = _user->id();
 	delete _user;
@@ -273,6 +277,7 @@ void ConnectionThread::joinEvent()
 
 	Event *e = _db->getEvent(id);
 
+	e->addInvited(_user->id());
 	e->addAttendant(_user->id());
 
 	_db->updateEvent(*e);
@@ -367,13 +372,18 @@ void ConnectionThread::commentData()
 {
 	qDebug() << "commentData";
 
-	Comment c;
-	c.setAuthorId(123321);
-	c.setId(123);
-	c.setContent("content");
-	c.setDate(QDateTime(QDateTime::currentDateTime()));
+	while (_socket->bytesAvailable() < sizeof(id_type)) {
+		_socket->waitForReadyRead(REFRESH_TIME);
+	}
 
-	_stream << c;
+	id_type id;
+
+	_stream >> id;
+
+	Comment *c = _db->getComment(id);
+
+	_stream << *c;
+	delete c;
 }
 
 void ConnectionThread::addComment()

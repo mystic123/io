@@ -54,7 +54,7 @@ public:
 
 	/* opertators */
 	void operator=(const Event&);
-	bool operator==(const Event&);
+	bool operator==(const Event&) const;
 
 	/* serialization */
 	friend QDataStream& operator<<(QDataStream&, const Event&);

@@ -9,23 +9,23 @@ DBController::~DBController() {
 
 DBController::DBController(qintptr id){
 	QSqlDatabase db = QSqlDatabase::addDatabase("QPSQL", QString::number(id));
-    /*db.setHostName("postgresql-mystic123.alwaysdata.net");
+	 db.setHostName("postgresql-mystic123.alwaysdata.net");
 	db.setUserName("mystic123_beviamo");
 	db.setPassword("beviamo");
 	db.setDatabaseName("mystic123_beviamo");
-
+/*
     db.setHostName("localhost");
      db.setUserName("siemin93");
      db.setPassword("siemin93");
      db.setDatabaseName("bev");*/
 
 /*to change*/
-
+/*
     db.setHostName("localhost");
     db.setUserName("postgres");
     db.setPassword("x");
     db.setDatabaseName("mydb");
-
+*/
     this->_db = db;
     this->_db.open();
 }
@@ -200,7 +200,7 @@ id_type DBController::createEvent(const Event &e)
             query.exec();
             while (query.next()) id = query.value(0).toLongLong();
 
-            /* adding realations to invited */
+				/* adding ralations to invited */
             QString pre("INSERT INTO invited (id_event, id_i_user, attended) VALUES ");
             QListIterator<id_type> i(e.invited());
             bool pierwszy = true;
