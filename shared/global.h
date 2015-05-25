@@ -24,6 +24,11 @@ enum class MessCodes : qint32 {
 	add_friend,
 	del_friend,
 	fb_friends_list,
+	comment_data,
+	add_comment,
+	update_comment,
+	del_comment,
+	createUserDEBUG
 };
 
 /* refreshing time when waiting for data */

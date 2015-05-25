@@ -380,5 +380,10 @@ int DBController::removeComment(const Comment &c)
             query.exec();
         } else return -1;
     } else return -1;
-    return 0;
+	 return 0;
+}
+
+Comment *DBController::getComment(const id_type)
+{
+	return nullptr;
 }

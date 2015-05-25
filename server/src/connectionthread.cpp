@@ -6,6 +6,8 @@
 
 #include "server.h"
 #include "fbsync.h"
+#include "event.h"
+#include "comment.h"
 
 const QMap<MessCodes, ConnectionThread::mem_func> ConnectionThread::_actions = {
 	{MessCodes::login, &ConnectionThread::login},
@@ -20,6 +22,11 @@ const QMap<MessCodes, ConnectionThread::mem_func> ConnectionThread::_actions = {
 	{MessCodes::add_friend, &ConnectionThread::addFriend},
 	{MessCodes::del_friend, &ConnectionThread::delFriend},
 	{MessCodes::fb_friends_list, &ConnectionThread::fbFriendsList},
+	{MessCodes::comment_data, &ConnectionThread::commentData},
+	{MessCodes::add_comment, &ConnectionThread::addComment},
+	{MessCodes::update_comment, &ConnectionThread::updateComment},
+	{MessCodes::del_comment, &ConnectionThread::delComment},
+	{MessCodes::createUserDEBUG, &ConnectionThread::createUserDbg}
 };
 
 ConnectionThread::ConnectionThread(qintptr ID, QObject *parent) : QThread(parent), _socket_desc(ID), _stream(), _user(nullptr), _db(new DBController(ID))
@@ -96,8 +103,51 @@ void ConnectionThread::login()
 	}
 	id_type user_id;
 	_stream >> user_id;
-	qDebug() << "dostałem:" << user_id;
 	_user = _db->getUserById(user_id);
+}
+
+void ConnectionThread::signup()
+{
+	qDebug()<<"signup";
+
+
+	while (_socket->bytesAvailable() < sizeof(qint32)) {
+		_socket->waitForReadyRead(REFRESH_TIME);
+	}
+
+	qint32 size;
+	_stream >> size;
+	while (_socket->bytesAvailable() < size) {
+		_socket->waitForReadyRead(REFRESH_TIME);
+	}
+
+	QString token(size);
+	_stream >> token;
+
+	FBsync fb;
+	fb.setToken(token);
+
+	QEventLoop loop;
+	connect(&fb,SIGNAL(userDataReady()),&loop,SLOT(quit()));
+	fb.fetchData();
+	loop.exec();
+
+	User u = fb.getUser();
+
+  for (auto f : u.friends()) {
+	  if (!_db->getUserById(f)->id()) {
+		  u.delFriend(f);
+	  }
+  }
+
+	_db->createUser(u);
+
+	id_type id = u.id();
+
+	_stream << u.id();
+	_user = _db->getUserById(id);
+
+	_socket->flush();
 }
 
 void ConnectionThread::userData()
@@ -270,50 +320,6 @@ void ConnectionThread::delFriend()
 	sendOK();
 }
 
-void ConnectionThread::signup()
-{
-	qDebug()<<"signup";
-
-
-	while (_socket->bytesAvailable() < sizeof(qint32)) {
-		_socket->waitForReadyRead(REFRESH_TIME);
-	}
-
-	qint32 size;
-	_stream >> size;
-	while (_socket->bytesAvailable() < size) {
-		_socket->waitForReadyRead(REFRESH_TIME);
-	}
-
-	QString token(size);
-	_stream >> token;
-
-	FBsync fb;
-	fb.setToken(token);
-
-	QEventLoop loop;
-	connect(&fb,SIGNAL(userDataReady()),&loop,SLOT(quit()));
-	fb.fetchData();
-	loop.exec();
-
-	User u = fb.getUser();
-
-  for (auto f : u.friends()) {
-	  if (!_db->getUserById(f)->id()) {
-		  u.delFriend(f);
-	  }
-  }
-
-	_db->createUser(u);
-
-	id_type id = u.id();
-
-	_stream << u.id();
-	_user = _db->getUserById(id);
-
-	_socket->flush();
-}
-
 void ConnectionThread::fbFriendsList()
 {
 	qDebug()<<"fb_friends";
@@ -341,25 +347,85 @@ void ConnectionThread::fbFriendsList()
 	loop.exec();
 
 	QList<id_type> fb_list = fb.friendsList();
-    qDebug() << "facebookiw:" << fb.friendsList();
 	QList<id_type> user_list = _user->friends();
 
 	QSet<id_type> fb_set = QSet<id_type>::fromList(fb_list);
     QSet<id_type> fb_set_tmp = QSet<id_type>::fromList(fb_list);
-qDebug() << "facebookiw set :" << fb_set;
 	QSet<id_type> user_set = QSet<id_type>::fromList(user_list);
-    qDebug() << "user_ser:" << user_set;
     QSet<id_type> intersect = fb_set_tmp.intersect(user_set);
-qDebug() << "intersect:" << intersect;
     fb_set.subtract(intersect);
-    qDebug() << fb_set;
 
     auto fb_list_r = fb_set.toList();
 
     _stream << fb_list_r.size();
     _socket->waitForBytesWritten();
     _stream << fb_set.toList();
-	_socket->flush();
+	 _socket->flush();
+}
+
+void ConnectionThread::commentData()
+{
+	qDebug() << "commentData";
+
+	Comment c;
+	c.setAuthorId(123321);
+	c.setId(123);
+	c.setContent("content");
+	c.setDate(QDateTime(QDateTime::currentDateTime()));
+
+	_stream << c;
+}
+
+void ConnectionThread::addComment()
+{
+	qDebug() << "addComment";
+
+	Comment c = Comment::readComment(_socket);
+
+	_db->createComment(c);
+
+	sendOK();
+}
+
+void ConnectionThread::updateComment()
+{
+	qDebug() << "updateComment";
+
+	Comment c = Comment::readComment(_socket);
+
+	_db->updateComment(c);
+
+	sendOK();
+}
+
+void ConnectionThread::delComment()
+{
+	qDebug() << "delComment";
+
+	while (_socket->bytesAvailable() < sizeof(qint32)) {
+		_socket->waitForReadyRead(REFRESH_TIME);
+	}
+
+	id_type cid;
+	_stream >> cid;
+
+	Comment *c = _db->getComment(cid);
+	_db->removeComment(*c);
+
+	delete c;
+
+	sendOK();
+}
+
+void ConnectionThread::createUserDbg()
+{
+	qDebug() << "createUserDbg";
+
+	User u = User::readUser(_socket);
+
+	_db->createUser(u);
+
+	sendOK();
 }
 
 void ConnectionThread::sendOK()

@@ -58,6 +58,7 @@ public:
 
 	/* opertators */
 	void operator=(const User&);
+	bool operator==(const User&);
 
 	/* serialization */
 	friend QDataStream& operator<<(QDataStream&, const User&);

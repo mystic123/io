@@ -1,7 +1,6 @@
 #include "user.h"
 #include <QTcpSocket>
 #include <QDataStream>
-#include <iostream>
 
 User::User(QObject *parent)
 {
@@ -182,6 +181,50 @@ void User::operator=(const User& u)
 	this->_friends = u.friends();
 	this->_eventsAttending = u.eventsAttending();
 	this->_eventsInvited = u.eventsInvited();
+}
+
+bool User::operator==(const User &u)
+{
+	if (_id != u.id()) {
+		return false;
+	}
+	if (_email != u.email()) {
+		return false;
+	}
+	if (_firstName != u.firstName()) {
+		return false;
+	}
+	if (_lastName != u.lastName()) {
+		return false;
+	}
+	if (_gender != u.gender()) {
+		return false;
+	}
+
+	/* check friends list*/
+	QSet<id_type> s1 = QSet<id_type>::fromList(_friends);
+	QSet<id_type> s2 = QSet<id_type>::fromList(u.friends());
+
+	if (s1 != s2) {
+		return false;
+	}
+
+	/* check events */
+	s1 = QSet<id_type>::fromList(_eventsAttending);
+	s2 = QSet<id_type>::fromList(u.eventsInvited());
+
+	if (s1 != s2) {
+		return false;
+	}
+
+	s1 = QSet<id_type>::fromList(_eventsAttending);
+	s2 = QSet<id_type>::fromList(u.eventsInvited());
+
+	if (s1 != s2) {
+		return false;
+	}
+
+	return true;
 }
 
 QDataStream& operator<<(QDataStream &out, const User &u)

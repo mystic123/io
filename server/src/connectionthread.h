@@ -44,6 +44,13 @@ private:
 	void delFriend();
 	void signup();
 	void fbFriendsList();
+	void commentData();
+	void addComment();
+	void updateComment();
+	void delComment();
+
+	/* testing functions */
+	void createUserDbg();
 
 	void sendOK();
 

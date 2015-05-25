@@ -20,7 +20,7 @@ protected:
 	void incomingConnection(qintptr socket_desc);
 
 private:
-    static const int port = 10776;
+	 static const int port = 10666;
 	static const int ThreadPoolSize = 100;
 };
 

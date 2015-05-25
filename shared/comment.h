@@ -4,11 +4,15 @@
 #include <QObject>
 #include "global.h"
 
+class QTcpSocket;
+class QDateTime;
+
 class Comment : public QObject
 {
 	Q_OBJECT
 public:
 	explicit Comment(QObject *parent = 0);
+	Comment(const Comment&);
 	~Comment();
 
 	id_type id() const;
@@ -26,9 +30,16 @@ public:
 	QDateTime date() const;
 	void setDate(const QDateTime &date);
 
-signals:
+	/* operators */
+	void operator=(const Comment&);
+	bool operator==(const Comment&);
 
-public slots:
+	/* serialization */
+	friend QDataStream& operator<<(QDataStream&, const Comment&);
+	friend QDataStream& operator>>(QDataStream&, Comment&);
+
+	/* static functions */
+	static Comment readComment(QTcpSocket*);
 
 private:
 	id_type _id;

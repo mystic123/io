@@ -5,6 +5,7 @@
 #include "event.h"
 #include "user.h"
 #include "comment.h"
+
 class DBController
 {
 public:
@@ -30,6 +31,7 @@ public:
     int createComment(const Comment &c);
     int updateComment(const Comment &c);
     int removeComment(const Comment &c);
+	 Comment* getComment(const id_type);
 
 
 private:

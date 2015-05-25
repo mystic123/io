@@ -49,9 +49,12 @@ public:
 
 	void addAttendant(id_type);
 	void addInvited(id_type);
+	void addComment(id_type);
+	void delComment(id_type);
 
 	/* opertators */
 	void operator=(const Event&);
+	bool operator==(const Event&);
 
 	/* serialization */
 	friend QDataStream& operator<<(QDataStream&, const Event&);
@@ -67,12 +70,11 @@ private:
 	QString _desc;
     QString _location;
 	QDateTime _date;
-    qint64 _how_long;
+	 qint64 _how_long;
     QList<id_type> _comments;
 	QList<id_type> _invited;
 	QList<id_type> _attending;
 	/* Location */
-	/* Comments */
 };
 
 Q_DECLARE_METATYPE(Event)

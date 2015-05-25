@@ -12,6 +12,7 @@ Event::Event(QObject *parent)
 	_location = "";
 	_date = QDateTime();
 	_how_long = 0;
+	_comments = {};
 	_invited = {};
 	_attending = {};
 }
@@ -28,7 +29,8 @@ Event::Event(const id_type id1, const id_type id2, const QString q, const QList<
 
 Event::Event(const Event& e): _id(e.id()), _founder(e.founder()),
 	_title(e.desc()), _desc(e.desc()), _location(e.location()),
-	_date(e.date()), _how_long(e.how_long()), _invited(e.invited()),
+	_date(e.date()), _how_long(e.how_long()),
+	_comments(e.comments()), _invited(e.invited()),
 	_attending(e.attending())
 {
 }
@@ -153,6 +155,16 @@ void Event::addInvited(id_type id)
 	_invited.append(id);
 }
 
+void Event::addComment(id_type id)
+{
+	_comments.append(id);
+}
+
+void Event::delComment(id_type id)
+{
+	_comments.removeOne(id);
+}
+
 
 void Event::operator=(const Event& e)
 {
@@ -162,8 +174,54 @@ void Event::operator=(const Event& e)
 	this->_desc = e.desc();
 	this->_date = e.date();
 	this->_location = e.location();
+	this->_comments = e.comments();
 	this->_invited = e.invited();
 	this->_attending = e.attending();
+}
+
+bool Event::operator==(const Event &e)
+{
+	if (_id != e.id()) {
+		return false;
+	}
+	if (_founder != e.founder()) {
+		return false;
+	}
+	if (_title != e.title()) {
+		return false;
+	}
+	if (_desc != e.desc()) {
+		return false;
+	}
+	if (_date != e.date()) {
+		return false;
+	}
+	if (_location != e.location()) {
+		return false;
+	}
+
+	QSet<id_type> s1 = QSet<id_type>::fromList(_comments);
+	QSet<id_type> s2 = QSet<id_type>::fromList(_comments);
+
+	if (s1 != s2) {
+		return false;
+	}
+
+	s1 = QSet<id_type>::fromList(_invited);
+	s2 = QSet<id_type>::fromList(e.invited());
+
+	if (s1 != s2) {
+		return false;
+	}
+
+	s1 = QSet<id_type>::fromList(_attending);
+	s2 = QSet<id_type>::fromList(e.attending());
+
+	if (s1 != s2) {
+		return false;
+	}
+
+	return true;
 }
 
 
@@ -171,14 +229,14 @@ QDataStream& operator<<(QDataStream& out, const Event& e)
 {
 	QByteArray array;
 	QDataStream stream(&array, QIODevice::WriteOnly);
-	stream << e._id << e._founder << e._title << e._desc << e._location << e._date << e._how_long << e._invited << e._attending;
+	stream << e._id << e._founder << e._title << e._desc << e._location << e._date << e._how_long << e._comments << e._invited << e._attending;
 	out << array;
 	return out;
 }
 
 QDataStream& operator>>(QDataStream& in, Event&e)
 {
-	 in >> e._id >> e._founder >> e._title >> e._desc >> e._location >> e._date >> e._how_long >> e._invited >> e._attending;
+	 in >> e._id >> e._founder >> e._title >> e._desc >> e._location >> e._date >> e._how_long >> e._comments >> e._invited >> e._attending;
 	 return in;
 }
 
