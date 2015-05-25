@@ -383,7 +383,22 @@ int DBController::removeComment(const Comment &c)
 	 return 0;
 }
 
-Comment *DBController::getComment(const id_type)
+Comment *DBController::getComment(const id_type id)
 {
-	return nullptr;
+    if (db().isValid()){
+        if (db().isOpen()){
+            QSqlQuery query(db());
+            query.prepare("SELECT * FROM comment WHERE c_id=" + QVariant(id).toString() + ";");
+            query.exec();
+            Comment *c =  new Comment;
+            while (query.next()){
+                c->setId(id);
+                c->setEvent(query.value(1).toLongLong());
+                c->setAuthorId(query.value(2).toLongLong());
+                c->setContent(query.value(3).toString());
+                c->setDate(QDateTime::fromString(query.value(4).toString(), "yyyy-MM-dd'T'hh:mm:ss"));
+            }
+            return c;
+        } else return nullptr;
+    }else return nullptr;
 }
