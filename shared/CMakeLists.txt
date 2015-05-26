@@ -2,14 +2,14 @@ set (HEADERS
    global.h
    user.h
    event.h
-    comment.h
+   comment.h
 )
 
 set (SOURCES
    global.cpp
    user.cpp
    event.cpp
-    comment.cpp
+   comment.cpp
 )
 
 add_library(SharedLib ${SOURCES})

@@ -50,10 +50,10 @@ Rectangle {
                         anchors.fill: parent
                         onClicked: {
                           console.log("dodaje friends")
-                          Bev.Client.addFriend(user_id)
-                          sv.pop()
-                          sv.pop()
-                          sv.push(Qt.resolvedUrl("friendsMenu.qml"))
+                          sv.pop();
+                          sv.pop();
+                          sv.push(Qt.resolvedUrl("friendsMenu.qml"));
+                          Bev.Client.addFriend(user_id);
                         }
                     }
                 }

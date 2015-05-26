@@ -69,9 +69,9 @@ Rectangle {
                         anchors.fill: parent
                         onClicked: {
                             console.log("usuwam friend")
-                            Bev.Client.delFriend(user_id);
                             sv.pop()
                             sv.push(Qt.resolvedUrl("friendsMenu.qml"))
+                            Bev.Client.delFriend(user_id);
                         }
                     }
                 }

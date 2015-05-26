@@ -14,13 +14,17 @@ SOURCES += \
 		client.cpp \
 		../shared/event.cpp \
 		../shared/user.cpp \
-		../shared/global.cpp
+		../shared/global.cpp \
+                ../shared/comment.cpp \
+    commenthandler.cpp \
 
 HEADERS +=  \
 		client.h \
 		../shared/event.h \
                 ../shared/user.h \
-                ../shared/global.h
+                ../shared/global.h \
+                ../shared/comment.h \
+    commenthandler.h \
 
 
 RESOURCES += qml.qrc
@@ -39,6 +43,7 @@ DISTFILES += \
 		android/build.gradle \
 		android/gradle/wrapper/gradle-wrapper.properties \
 		android/gradlew \
-		android/gradlew.bat
+		android/gradlew.bat \
+    qrc/googlemapa.html
 
 ANDROID_PACKAGE_SOURCE_DIR = $$PWD/android

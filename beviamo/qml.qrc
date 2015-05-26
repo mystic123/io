@@ -14,5 +14,6 @@
         <file>qrc/FacebookView.qml</file>
         <file>qrc/addFriends.qml</file>
         <file>qrc/fbLogOut.qml</file>
+        <file>qrc/comments.qml</file>
     </qresource>
 </RCC>

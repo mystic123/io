@@ -20,7 +20,7 @@ ApplicationWindow {
             initialItem: Qt.resolvedUrl("FacebookView.qml")
 
             Keys.onReleased: {
-//                console.log("KEY_PRESSED: " + event.key)
+//                console.log("KEY_RELEASED: " + event.key)
 //                console.log("depth: " + sv.depth)
                 if (event.key === Qt.Key_Back) {
                     if (sv.depth > 1) {

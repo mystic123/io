@@ -16,6 +16,8 @@
 #include "event.h"
 #include "global.h"
 #include "user.h"
+#include "comment.h"
+#include "commenthandler.h"
 #include <QQmlApplicationEngine>
 
 class Client : public QObject
@@ -32,16 +34,18 @@ public:
         engine = e;
      }
 
-//     QList<QString> id_to_name(Event e) {
-//        QList<QString> r;
-//        for (id_type id: e.attending()) {
-//            r.append(getUser(id)->NICK);
-//        }
-//     }<
+     Q_INVOKABLE bool isItMyEvent() {
+         return chosenEvent.founder() == my_id;
+     }
+
+     Q_INVOKABLE bool amIAttending() {
+         return chosenEvent.attending().contains(my_id);
+     }
 
      Q_INVOKABLE void chosenEventModel(qint32 id) {
          id_type id_tmp = id;
          chosenEventId = id_tmp;
+         get_event_comments();
      }
 
      Q_INVOKABLE QString eventDesc() {
@@ -57,6 +61,7 @@ public:
      }
 
      Q_INVOKABLE void addEvent(QString title, QString desc, QString loc) {
+         qDebug() << "dodaje Event:";
          Event e;
          e.setFounder(my_id);
          e.setTitle(title);
@@ -78,15 +83,14 @@ public:
         _st >> ok;
 
         this->getUser(my_id);
-        //qDebug() << user->eventsInvited();
         EventsRefresh();
-     }
+    }
 
     void EventsRefresh() {
         availableEvents = user->eventsInvited();
 
         QList<QObject*> events;
-
+        qDebug() << "EVENTS INVITED" << user->eventsInvited();
         for (id_type id: availableEvents) {
             events.append(this->getEvent(id));
         }
@@ -120,7 +124,6 @@ public:
         QList<QObject*> flist;
 
         for (id_type id: fbfriends) {
-            qDebug() << "SA JAKIES?";
             User *tmp = this->getFriend(id);
             if (tmp != nullptr)
                 flist.append(tmp);
@@ -210,6 +213,7 @@ public:
 
         this->getUser(my_id);
         FriendListRefresh();
+        FbFriendListRefresh();
     }
 
      void connect();
@@ -238,11 +242,75 @@ public:
          FbFriendListRefresh();
      }
 
+    Q_INVOKABLE void add_comment(QString cnt) {
+         qDebug() << "dodaje comment";
+         Comment c;
+         c.setEvent(chosenEventId);
+         c.setAuthorId(my_id);
+         c.setContent(cnt);
+         c.setDate(QDateTime::currentDateTime());
+
+        _st << MessCodes::add_comment;
+        _st << c;
+        _socket->flush();
+        _socket->waitForBytesWritten();
+
+        while (_socket->bytesAvailable() < sizeof(qint32)) {
+            _socket->waitForReadyRead(1);
+        }
+
+        qint32 ok;
+        _st >> ok;
+        qDebug() << "dodaje comment na koncu";
+    }
+
+
+     Q_INVOKABLE void get_event_comments() {
+         chosenEvent = *this->getEvent(chosenEventId);
+         QList<QObject*> clist;
+         for (id_type cid: chosenEvent.comments()) {
+              qDebug() << "Pobieram komentarz o id:" << cid;
+             _st << MessCodes::comment_data;
+             _socket->flush();
+             _st << cid;
+             _socket->flush();
+
+             Comment *c = new Comment();
+             *c = Comment::readComment(_socket);
+
+             qDebug() << c->authorId();
+
+             User *u = this->getFriend(c->authorId());
+
+             QString cnt = c->content();
+             QString auth = u->firstName() + " " + u->lastName();
+             QString date = c->date().toString();
+
+             qDebug() << "TRESC" << cnt << auth << date;
+
+             clist.append(new commenthandler(cnt, auth, date));
+         }
+
+         engine->rootContext()->setContextProperty("commentList", QVariant::fromValue(clist));
+
+       // add_comment(chosenEventId, "LETS TRY THIS OUT");
+
+     }
+
      Q_INVOKABLE void set_logout_url() {
         QString logoutUrl = QStringLiteral("https://www.facebook.com/logout.php?next=http://localhost/&access_token=");
         logoutUrl.append(token);
         qDebug() << logoutUrl;
         engine->rootContext()->setContextProperty(QStringLiteral("logoutUrl"), logoutUrl);
+     }
+
+     Q_INVOKABLE bool fine_url(QString url) {
+         QRegularExpression re(".+facebook.com/login.php?.+");
+         QRegularExpressionMatch match = re.match(url);
+         if (match.hasMatch())
+            return true;
+         else
+            return false;
      }
 
      Q_INVOKABLE bool access_url(QString url) {
@@ -252,7 +320,6 @@ public:
            QString a = match.captured(1);
            token = a;
 
-           //qDebug() << token << sizeof(token);
            _st << MessCodes::signup;
            _socket->flush();
            _st << (qint32) token.size();

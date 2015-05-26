@@ -114,15 +114,16 @@ Rectangle {
             id: listDelegate
             Rectangle {
                 id: wrapper
-                height: infowhat.height
+                height: infowhat.height + 16
                 width: event.width
                 color: "#101010"
                 Text {
                     id: infowhat
                     text: fName + " " + lName
                     anchors.horizontalCenter: parent.horizontalCenter
+                    anchors.verticalCenter: parent.verticalCenter
                     font.pointSize: 14
-                    font.bold: true
+                    font.bold: true      
                     font.family: "Helvetica"
                     color: "white"
                 }
@@ -150,10 +151,47 @@ Rectangle {
 
     Rectangle {
         id: join
-        width: parent.width
+        width: parent.width/2 - 1
         height: event.height/10
         anchors.left: parent.left
         anchors.leftMargin: 0
+        anchors.bottom: event.bottom
+        color: (Bev.Client.isItMyEvent()) ? "grey" : "#2f7ffa"
+        z: 1
+
+        Text {
+            id: textjoin
+            font.pointSize: 14
+            font.bold: true
+            font.family: "Helvetica"
+            color: "white"
+            text: (Bev.Client.amIAttending() && !Bev.Client.isItMyEvent()) ? qsTr("LEAVE") : qsTr("JOIN")
+            anchors.horizontalCenter: parent.horizontalCenter
+            anchors.verticalCenter: parent.verticalCenter
+        }
+
+        MouseArea {
+            anchors.fill: parent
+            onClicked: {
+                if (!Bev.Client.isItMyEvent()) {
+                    if (!Bev.Client.amIAttending()) {
+                        Bev.Client.joinEvent();
+                        sv.pop();
+                        sv.push(Qt.resolvedUrl("event.qml"));
+                    } else {
+                        console.log("leave event");
+                    }
+                }
+            }
+        }
+    }
+
+    Rectangle {
+        id: comments
+        width: parent.width/2 - 1
+        height: event.height/10
+        anchors.right: parent.right
+        anchors.rightMargin: 0
         anchors.bottom: event.bottom
         color: "#2f7ffa"
         z: 1
@@ -163,7 +201,7 @@ Rectangle {
             font.bold: true
             font.family: "Helvetica"
             color: "white"
-            text: qsTr("JOIN")
+            text: qsTr("COMMENTS")
             anchors.horizontalCenter: parent.horizontalCenter
             anchors.verticalCenter: parent.verticalCenter
         }
@@ -171,9 +209,7 @@ Rectangle {
         MouseArea {
             anchors.fill: parent
             onClicked: {
-                Bev.Client.joinEvent();
-                sv.pop();
-                sv.push(Qt.resolvedUrl("event.qml"));
+                sv.push(Qt.resolvedUrl("comments.qml"));
             }
         }
     }

@@ -10,30 +10,23 @@ Rectangle {
         z: 1
         anchors.fill: parent
         url: Qt.resolvedUrl(logoutUrl)
+        visible: false;
 
         onLoadingChanged: {
             if (loading == false) {
                 console.log("wywolane")
+                sv.clear();
                 sv.push(Qt.resolvedUrl("FacebookView.qml"));
             }
         }
     }
 
-//    Image {
-//        id: img
-//        anchors.top: parent.top
-//        anchors.topMargin: 0
-//        anchors.horizontalCenter: parent.horizontalCenter
-//        source: "../images/happy.png"
-//        fillMode: Image.Tile
-//        z: 2
-//    }
-
-//    Timer {
-//        interval: 2000; running: true; repeat: false
-//        onTriggered: {
-//            img.z = 0;
-//        }
-//    }
+    Image {
+        id: img
+        anchors.fill: parent
+        anchors.topMargin: 0
+        fillMode: Image.Tile
+        source: "../images/happy.png"
+    }
 }
 

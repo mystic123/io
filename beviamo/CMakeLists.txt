@@ -5,6 +5,7 @@ qt5_add_resources(BeviamoRsrc qml.qrc)
 add_executable(Beviamo
 	main.cpp
 	client.cpp
+        commenthandler.cpp
 	${BeviamoRsrc}
 	)
 

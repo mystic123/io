@@ -1,11 +1,10 @@
 #include "client.h"
 #include "user.h"
 
-
 Client::Client(QObject *parent) : QObject(parent)
 {
     _socket = new QTcpSocket();
-    _socket->connectToHost("10.20.5.214", 10776);
+    _socket->connectToHost("172.20.10.10", 10998);
     _socket->waitForConnected();
     qDebug() << _socket->state();
     _st.setDevice(_socket);
@@ -37,7 +36,8 @@ Event* Client::getEvent(id_type id)
     Event *e = new Event();
     *e = Event::readEvent(_socket);
     qDebug() << "ID POBIERAM" << e->id();
-    qDebug() << "DODANI" << e->attending();
+//    qDebug() << "DODANI" << e->attending();
+    qDebug() << "lista commentarzy" << e->comments();
     return e;
 }
 
@@ -49,7 +49,6 @@ User* Client::getUser(id_type id)
     _socket->flush();
     User *u = new User();
     *u = User::readUser(_socket);
-    //qDebug() << u->eventsInvited();
     this->user = u;
     return u;
 }
