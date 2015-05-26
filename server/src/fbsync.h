@@ -22,8 +22,11 @@ public:
 
 	User getUser() const;
 
+	bool wasError() const;
+
 signals:
 	void userDataReady();
+	void error();
 
 private slots:
 	void fetchUserDataS(QNetworkReply*);
@@ -39,6 +42,7 @@ private:
 	User _user;
 	bool _dataReady;
 	bool _friendsReady;
+	bool _wasError;
 
 };
 

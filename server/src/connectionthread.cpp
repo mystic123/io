@@ -17,7 +17,6 @@ const QMap<MessCodes, ConnectionThread::mem_func> ConnectionThread::_actions = {
 	{MessCodes::event_data, &ConnectionThread::eventData},
 	{MessCodes::create_event, &ConnectionThread::createEvent},
 	{MessCodes::update_event, &ConnectionThread::updateEvent},
-	{MessCodes::invite_event , &ConnectionThread::inviteEvent},
 	{MessCodes::join_event, &ConnectionThread::joinEvent},
 	{MessCodes::add_friend, &ConnectionThread::addFriend},
 	{MessCodes::del_friend, &ConnectionThread::delFriend},
@@ -26,7 +25,8 @@ const QMap<MessCodes, ConnectionThread::mem_func> ConnectionThread::_actions = {
 	{MessCodes::add_comment, &ConnectionThread::addComment},
 	{MessCodes::update_comment, &ConnectionThread::updateComment},
 	{MessCodes::del_comment, &ConnectionThread::delComment},
-	{MessCodes::createUserDEBUG, &ConnectionThread::createUserDbg}
+	{MessCodes::create_userDEBUG, &ConnectionThread::createUserDbg},
+	{MessCodes::del_user, &ConnectionThread::delUser}
 };
 
 ConnectionThread::ConnectionThread(qintptr ID, QObject *parent) : QThread(parent), _socket_desc(ID), _stream(), _user(nullptr), _db(new DBController(ID))
@@ -35,9 +35,13 @@ ConnectionThread::ConnectionThread(qintptr ID, QObject *parent) : QThread(parent
 
 ConnectionThread::~ConnectionThread()
 {
-	delete _socket;
-	delete _user;
-	delete _db;
+	qDebug() << "conn thread destructor";
+	if (_socket)
+		delete _socket;
+	if (_user)
+		delete _user;
+	if (_db)
+		delete _db;
 }
 
 void ConnectionThread::run()
@@ -72,7 +76,7 @@ void ConnectionThread::readyRead()
 
 	_stream >> m_code;
 
-	if (m_code != MessCodes::error_occured)
+	if (m_code != MessCodes::error)
 		qDebug()<<"m_code: "<<(qint32)m_code;
 	else
 		qDebug()<<"error\n";
@@ -104,7 +108,13 @@ void ConnectionThread::login()
 	id_type user_id;
 	_stream >> user_id;
 	_user = _db->getUserById(user_id);
-	qDebug() << "logged: " << _user->firstName() << _user->lastName();
+	if (_user) {
+		qDebug() << "logged: " << _user->firstName() << _user->lastName();
+		sendOK();
+	}
+	else {
+		sendError();
+	}
 }
 
 void ConnectionThread::signup()
@@ -130,8 +140,15 @@ void ConnectionThread::signup()
 
 	QEventLoop loop;
 	connect(&fb,SIGNAL(userDataReady()),&loop,SLOT(quit()));
+	connect(&fb,SIGNAL(error()),&loop,SLOT(quit()));
 	fb.fetchData();
 	loop.exec();
+
+	if (fb.wasError()) {
+		sendError();
+		emit _socket->disconnected();
+		return;
+	}
 
 	User u = fb.getUser();
 
@@ -143,11 +160,11 @@ void ConnectionThread::signup()
 
 	_db->createUser(u);
 
-	id_type id = u.id();
+	sendOK();
 
+	id_type id = u.id();
 	_stream << u.id();
 	_user = _db->getUserById(id);
-
 	_socket->flush();
 }
 
@@ -162,14 +179,35 @@ void ConnectionThread::userData()
 	id_type user_id;
 	_stream >> user_id;
 	if (user_id == _user->id()) {
+		qDebug() << _user->toString();
 		_stream << *_user;
 	}
 	else {
 		User *u = _db->getUserById(user_id);
-		_stream << *u;
-		delete u;
+		if (u) {
+			_stream << *u;
+			delete u;
+		}
+		else {
+			User u;
+			_stream << u;
+		}
 	}
 	_socket->flush();
+}
+
+void ConnectionThread::delUser()
+{
+	qDebug() << "delUser";
+
+	if (_user) {
+		_db->removeUser(*_user);
+		sendOK();
+	}
+	else {
+		sendError();
+	}
+	emit _socket->disconnected();
 }
 
 void ConnectionThread::friendsList()
@@ -205,7 +243,6 @@ void ConnectionThread::eventData()
 	Event *e = _db->getEvent(event_id);
 	if (!e->id())
 		qDebug() << "ERROR: Event id = 0";
-	qDebug() << "event comments:"<<e->comments();
 	_stream << *e;
 	_socket->flush();
 	delete e;
@@ -239,29 +276,6 @@ void ConnectionThread::updateEvent()
 	Event e = Event::readEvent(_socket);
 	_db->updateEvent(e);
 
-	sendOK();
-}
-
-void ConnectionThread::inviteEvent()
-{
-	qDebug()<<"inviteEvent";
-
-	while (_socket->bytesAvailable() < sizeof(id_type)) {
-		_socket->waitForReadyRead(REFRESH_TIME);
-	}
-
-	id_type id;
-	_stream >> id;
-
-	Event *e = _db->getEvent(id);
-
-	e->addInvited(_user->id());
-
-	_db->updateEvent(*e);
-
-	id_type uid = _user->id();
-	delete _user;
-	_user = _db->getUserById(uid);
 	sendOK();
 }
 
@@ -442,5 +456,11 @@ void ConnectionThread::createUserDbg()
 void ConnectionThread::sendOK()
 {
 	_stream << MessCodes::ok;
+	_socket->flush();
+}
+
+void ConnectionThread::sendError()
+{
+	_stream << MessCodes::error;
 	_socket->flush();
 }

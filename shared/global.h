@@ -10,7 +10,7 @@ typedef qint64 id_type;
 
 enum class MessCodes : qint32 {
 	ok,
-	error_occured,
+	error,
 	login,
 	signup,
    user_data,
@@ -19,7 +19,6 @@ enum class MessCodes : qint32 {
    event_data,
 	create_event,
 	update_event,
-	invite_event,
 	join_event,
 	add_friend,
 	del_friend,
@@ -28,7 +27,8 @@ enum class MessCodes : qint32 {
 	add_comment,
 	update_comment,
 	del_comment,
-	createUserDEBUG
+	create_userDEBUG,
+	del_user
 };
 
 /* refreshing time when waiting for data */

@@ -9,10 +9,17 @@ DBController::~DBController() {
 
 DBController::DBController(qintptr id){
 	QSqlDatabase db = QSqlDatabase::addDatabase("QPSQL", QString::number(id));
+	/*
 	 db.setHostName("postgresql-mystic123.alwaysdata.net");
 	db.setUserName("mystic123_beviamo");
 	db.setPassword("beviamo");
 	db.setDatabaseName("mystic123_beviamo");
+	*/
+
+	db.setHostName("localhost");
+  db.setUserName("beviamo");
+  db.setPassword("beviamo");
+  db.setDatabaseName("beviamo");
 /*
     db.setHostName("localhost");
      db.setUserName("siemin93");
@@ -120,7 +127,7 @@ int DBController::removeUser(const User &u)
     if (db().isValid()){
         if (db().isOpen()){
             QSqlQuery query(db());
-            query.prepare("DELETE FROM users WHERE u_id=" + QVariant(u.id()).toString() + ";");
+				query.prepare("DELETE FROM users WHERE u_id=" + QVariant(u.id()).toString() + ";");
             query.exec();
         } else return -1;
     } else return -1;

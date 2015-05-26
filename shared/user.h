@@ -13,7 +13,7 @@ class User : public QObject
 	Q_OBJECT
 	Q_PROPERTY(QString fName READ firstName)
 	Q_PROPERTY(QString lName READ lastName)
-    Q_PROPERTY(QString user_id READ id_string)
+	Q_PROPERTY(QString user_id READ id_string)
 
 public:
 	/* constructors */
@@ -56,7 +56,9 @@ public:
 	void inviteToEvent(id_type);
 	void joinEvent(id_type);
 
-	/* opertators */
+	QString toString() const;
+
+	/* operators */
 	void operator=(const User&);
 	bool operator==(const User&);
 

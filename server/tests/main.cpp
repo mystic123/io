@@ -200,13 +200,23 @@ bool testLogin(const User &u)
 
 	st << u.id();
 
+	while (socket->bytesAvailable() < sizeof(MessCodes)) {
+		socket->waitForReadyRead(REFRESH_TIME);
+	}
+
+	MessCodes c;
+	st >> c;
+	if (c != MessCodes::ok) {
+		return false;
+	}
+
 	return true;
 }
 
-id_type testSignup(QString token)
+bool testSignup(QString token)
 {
 	if (token.compare("0") == 0) {
-		return 0;
+		return true;
 	}
 
 	st << MessCodes::signup;
@@ -214,20 +224,38 @@ id_type testSignup(QString token)
 	st << token;
 	socket->waitForBytesWritten();
 
-	while (socket->bytesAvailable() < sizeof(id_type)) {
+	while (socket->bytesAvailable() < sizeof(MessCodes)) {
 		socket->waitForReadyRead(REFRESH_TIME);
 	}
 
+	MessCodes c;
+	st >> c;
+
+	if (c != MessCodes::ok) {
+		return false;
+	}
+
+	while (socket->bytesAvailable() < sizeof(id_type)) {
+		socket->waitForReadyRead(REFRESH_TIME);
+	}
 	id_type id;
 	st >> id;
 
-	qDebug() << "OK";
-	return id;
+
+	st << MessCodes::user_data;
+
+	st << id;
+	socket->flush();
+	User u1 = User::readUser(socket);
+
+	qDebug() << "Fetched data:";
+	qDebug() << u1.toString();
+	return true;
 }
 
 bool testCreateUserS(const User &u)
 {
-	st << MessCodes::createUserDEBUG;
+	st << MessCodes::create_userDEBUG;
 	st << u;
 
 	while (socket->bytesAvailable() < sizeof(MessCodes)) {
@@ -250,7 +278,7 @@ bool testUserData(const User &u)
 
 	User u1 = User::readUser(socket);
 
-	return u1 == u;
+	return (u1 == u);
 }
 
 bool testCreateEvent(Event &e)
@@ -320,32 +348,7 @@ bool testUpdateEvent(Event& e)
 
 	return (ne == e);
 }
-/*
-bool testInviteEvent(Event& e, const User& u)
-{
-	st << MessCodes::invite_event;
 
-	st << u.id();
-
-	while (socket->bytesAvailable() < sizeof(MessCodes)) {
-		socket->waitForReadyRead(REFRESH_TIME);
-	}
-
-	MessCodes code;
-	st >> code;
-
-	if (code != MessCodes::ok)
-		return false;
-
-	st << MessCodes::event_data;
-
-	st << e.id();
-	e = Event::readEvent(socket);
-
-	qDebug() << e.invited();
-	return e.invited().contains(u.id());
-}
-*/
 bool testJoinEvent(Event& e, const User& u)
 {
 	st << MessCodes::join_event;
@@ -367,7 +370,6 @@ bool testJoinEvent(Event& e, const User& u)
 	st << e.id();
 	e = Event::readEvent(socket);
 
-	qDebug() << e.attending() << u.id();
 	return e.attending().contains(u.id());
 }
 
@@ -457,6 +459,20 @@ bool testAddComment(const Comment &c)
 	return (c1 == c);
 }
 
+bool testRemoveUser(const User &u)
+{
+	st << MessCodes::del_user;
+
+	while (socket->bytesAvailable() < sizeof(MessCodes)) {
+		socket->waitForReadyRead(REFRESH_TIME);
+	}
+
+	MessCodes code;
+	st >> code;
+
+	return (code == MessCodes::ok);
+}
+
 int main(int argc, char *argv[])
 {
 	 /*   przed uzyciem wyczyscic baze danych
@@ -543,5 +559,38 @@ int main(int argc, char *argv[])
 	 testLogin(u2);
 	 qDebug() << "Testing join event: " << ((testJoinEvent(e,u2)) ? "OK" : "ERROR!");
 
-	 return 0;
+	 qDebug() << "Removing User1: " << ((testRemoveUser(u2)) ? "OK" : "ERROR!");
+
+	 socket->disconnectFromHost();
+	 socket->connectToHost(ip, port);
+	 socket->waitForConnected();
+	 if (socket->state() != QTcpSocket::ConnectedState) {
+		 qDebug() << "Cant connect to server on:" << ip << ":" << port;
+		 return 0;
+	 }
+
+	 testLogin(u1);
+	 qDebug() << "Removing User2: " << ((testRemoveUser(u1)) ? "OK" : "ERROR!");
+
+	 socket->disconnectFromHost();
+	 socket->connectToHost(ip, port);
+	 socket->waitForConnected();
+	 if (socket->state() != QTcpSocket::ConnectedState) {
+		 qDebug() << "Cant connect to server on:" << ip << ":" << port;
+		 return 0;
+	 }
+
+	 qDebug() << "Do you want to test signup? (token needed) [y/n]";
+	string str;
+
+	cin >> str;
+
+	if (str.compare("y") == 0) {
+		qDebug() << "Enter token:";
+		string token;
+		cin >> token;
+		testSignup(QString::fromStdString(token));
+	}
+
+	return 0;
 }

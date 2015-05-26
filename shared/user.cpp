@@ -170,6 +170,38 @@ void User::joinEvent(id_type id)
 		_eventsAttending.append(id);
 }
 
+QString User::toString() const
+{
+	QString str;
+	str += "(";
+	str += QString::number(_id);
+	str += ",";
+	str  += _email;
+	str  += ",";
+	str  += _firstName;
+	str += ",";
+	str += _lastName;
+	str += ",";
+	str += _gender;
+	str += ", (";
+	for (auto x : _friends) {
+		str += QString::number(x);
+		str += ",";
+	}
+	str += "), (";
+	for (auto x : _eventsInvited) {
+		str += QString::number(x);
+		str += ",";
+	}
+	str += "), (";
+	for (auto x : _eventsAttending) {
+		str += QString::number(x);
+		str += ",";
+	}
+	str += "))";
+	return str;
+}
+
 
 void User::operator=(const User& u)
 {
@@ -186,18 +218,23 @@ void User::operator=(const User& u)
 bool User::operator==(const User &u)
 {
 	if (_id != u.id()) {
+		qDebug() << "uid" << _id << u.id();
 		return false;
 	}
 	if (_email != u.email()) {
+		qDebug() << "umail";
 		return false;
 	}
 	if (_firstName != u.firstName()) {
+		qDebug() << "ufname";
 		return false;
 	}
 	if (_lastName != u.lastName()) {
+		qDebug() << "ulast";
 		return false;
 	}
 	if (_gender != u.gender()) {
+		qDebug() << "ugender";
 		return false;
 	}
 
@@ -206,6 +243,7 @@ bool User::operator==(const User &u)
 	QSet<id_type> s2 = QSet<id_type>::fromList(u.friends());
 
 	if (s1 != s2) {
+		qDebug() << "ufriends";
 		return false;
 	}
 
@@ -214,6 +252,7 @@ bool User::operator==(const User &u)
 	s2 = QSet<id_type>::fromList(u.eventsInvited());
 
 	if (s1 != s2) {
+		qDebug() << "ueventsinv";
 		return false;
 	}
 
@@ -221,6 +260,7 @@ bool User::operator==(const User &u)
 	s2 = QSet<id_type>::fromList(u.eventsInvited());
 
 	if (s1 != s2) {
+		qDebug() << "ueventsatt";
 		return false;
 	}
 

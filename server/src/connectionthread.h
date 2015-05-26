@@ -34,11 +34,11 @@ private:
 	static const QMap<MessCodes, mem_func> _actions;
 	void login();
 	void userData();
+	void delUser();
 	void friendsList();
 	void eventData();
 	void createEvent();
 	void updateEvent();
-	void inviteEvent();
 	void joinEvent();
 	void addFriend();
 	void delFriend();
@@ -53,6 +53,7 @@ private:
 	void createUserDbg();
 
 	void sendOK();
+	void sendError();
 
 	QTcpSocket *_socket;
 	qintptr _socket_desc;
