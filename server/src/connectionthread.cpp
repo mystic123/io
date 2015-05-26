@@ -205,6 +205,7 @@ void ConnectionThread::eventData()
 	Event *e = _db->getEvent(event_id);
 	if (!e->id())
 		qDebug() << "ERROR: Event id = 0";
+	qDebug() << "event comments:"<<e->comments();
 	_stream << *e;
 	_socket->flush();
 	delete e;
@@ -218,7 +219,7 @@ void ConnectionThread::createEvent()
 
 
 	QList<id_type> l = _user->friends();
-	l.prepend(_user->id());
+	//l.prepend(_user->id());
 
 	e.setInvited(l);
 

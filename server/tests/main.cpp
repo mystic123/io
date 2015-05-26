@@ -367,6 +367,7 @@ bool testJoinEvent(Event& e, const User& u)
 	st << e.id();
 	e = Event::readEvent(socket);
 
+	qDebug() << e.attending() << u.id();
 	return e.attending().contains(u.id());
 }
 
@@ -514,8 +515,8 @@ int main(int argc, char *argv[])
 	 e.setLocation("event location");
 	 e.setDate(QDateTime(QDateTime::currentDateTime()));
 	 e.setHow_long(1);
-	 e.setInvited({u1.id()});
-	 e.setAttending({u1.id()});
+	 e.setInvited({});
+	 e.setAttending({});
 
 	 st.setDevice(socket);
 
@@ -541,7 +542,6 @@ int main(int argc, char *argv[])
 
 	 testLogin(u2);
 	 qDebug() << "Testing join event: " << ((testJoinEvent(e,u2)) ? "OK" : "ERROR!");
-
 
 	 return 0;
 }

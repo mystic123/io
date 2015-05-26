@@ -182,22 +182,28 @@ void Event::operator=(const Event& e)
 bool Event::operator==(const Event &e) const
 {
 	if (_id != e.id()) {
+		qDebug() << "id";
 		return false;
 	}
 	if (_founder != e.founder()) {
+		qDebug() << "fo";
 		return false;
 	}
 	if (_title != e.title()) {
+		qDebug() << "tit";
 		return false;
 	}
 	if (_desc != e.desc()) {
+		qDebug() << "desc";
 		return false;
 	}
 	/* comparing dates */
 	if (_date.toString("yyyy-MM-dd'T'hh:mm:ss").compare(e.date().toString("yyyy-MM-dd'T'hh:mm:ss")) != 0) {
+		qDebug() << "date";
 		return false;
 	}
 	if (_location != e.location()) {
+		qDebug() << "loca";
 		return false;
 	}
 
@@ -205,6 +211,7 @@ bool Event::operator==(const Event &e) const
 	QSet<id_type> s2 = QSet<id_type>::fromList(e.comments());
 
 	if (s1 != s2) {
+		qDebug() << "comm";
 		return false;
 	}
 
@@ -212,6 +219,9 @@ bool Event::operator==(const Event &e) const
 	s2 = QSet<id_type>::fromList(e.invited());
 
 	if (s1 != s2) {
+		qDebug() << "inv";
+		qDebug() << s1;
+		qDebug() << s2;
 		return false;
 	}
 
@@ -219,6 +229,7 @@ bool Event::operator==(const Event &e) const
 	s2 = QSet<id_type>::fromList(e.attending());
 
 	if (s1 != s2) {
+		qDebug() << "att";
 		return false;
 	}
 
