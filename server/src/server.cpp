@@ -30,6 +30,6 @@ void Server::incomingConnection(qintptr socket_desc)
 
 	connect(thread, SIGNAL(finished()), thread, SLOT(deleteLater()));
 
-	QThreadPool::globalInstance()->start(thread);
-//	thread->start();
+	//QThreadPool::globalInstance()->start(thread);
+	thread->start();
 }

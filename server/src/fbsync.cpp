@@ -50,10 +50,10 @@ User FBsync::getUser() const
 void FBsync::fetchUserData()
 {
 	QUrlQuery urlQuery;
-		urlQuery.setQuery("https://graph.facebook.com/me?");
-		urlQuery.addQueryItem("access_token", _token);
-		QNetworkRequest request;
-		request.setUrl(QUrl(urlQuery.query()));
+	urlQuery.setQuery("https://graph.facebook.com/me?");
+	urlQuery.addQueryItem("access_token", _token);
+	QNetworkRequest request;
+	request.setUrl(QUrl(urlQuery.query()));
 	QNetworkAccessManager *mgr = new QNetworkAccessManager(this);
 	connect(mgr, SIGNAL(finished(QNetworkReply*)), this, SLOT(fetchUserDataS(QNetworkReply*)));
 	mgr->get(request);
@@ -83,7 +83,7 @@ void FBsync::fetchUserDataS(QNetworkReply *reply)
 	if (obj.find("error") != obj.end()) {
 		qDebug() << "error in fetch userdatas";
 		_wasError = true;
-		emit error();
+		//emit error();
 		return;
 	}
 
@@ -105,7 +105,7 @@ void FBsync::fetchFriendsS(QNetworkReply *reply)
 	if (jsonResponse.object().find("error") != jsonResponse.object().end()) {
 		qDebug() << "error in fetch friends";
 		_wasError = true;
-		emit error();
+		//emit error();
 		return;
 	}
 

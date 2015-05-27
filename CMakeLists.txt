@@ -10,7 +10,7 @@ ELSE(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
    set(CMAKE_PREFIX_PATH "/opt/Qt/5.4/gcc/")
 ENDIF(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
 
-set(CMAKE_CXX_FLAGS "-Wall -std=c++11")
+set(CMAKE_CXX_FLAGS "-Wall -std=c++11 -g -O0")
 #set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS} -ggdb -W -fsanitize=address")
 #set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS} -O3")
 set(EXECUTABLE_OUTPUT_PATH "${Beviamo_SOURCE_DIR}/build/")

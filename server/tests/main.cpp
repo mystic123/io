@@ -232,6 +232,7 @@ bool testSignup(QString token)
 	st >> c;
 
 	if (c != MessCodes::ok) {
+		qDebug() << "Error. Wrong token?";
 		return false;
 	}
 
@@ -592,5 +593,6 @@ int main(int argc, char *argv[])
 		testSignup(QString::fromStdString(token));
 	}
 
+	socket->disconnectFromHost();
 	return 0;
 }

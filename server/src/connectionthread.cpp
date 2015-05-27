@@ -35,18 +35,17 @@ ConnectionThread::ConnectionThread(qintptr ID, QObject *parent) : QThread(parent
 
 ConnectionThread::~ConnectionThread()
 {
-	qDebug() << "conn thread destructor";
-	if (_socket)
-		delete _socket;
-	if (_user)
+	if (_user) {
 		delete _user;
-	if (_db)
+	}
+	if (_db) {
 		delete _db;
+	}
 }
 
 void ConnectionThread::run()
 {
-	qDebug()<<"Thread started\n";
+	qDebug()<<"Thread started\n" << QThread::currentThreadId();
 
 	this->setAutoDelete(false);
 
@@ -72,6 +71,13 @@ void ConnectionThread::run()
 void ConnectionThread::readyRead()
 {
 	qDebug() << "readyRead";
+
+	/* needs to be added in release
+	if (!_user) {
+		signup();
+	}
+	*/
+
 	MessCodes m_code;
 
 	_stream >> m_code;
@@ -95,7 +101,7 @@ void ConnectionThread::readyRead()
 void ConnectionThread::disconnected()
 {
 	qDebug()<<_socket_desc<<"Disconnected";
-	//_socket->deleteLater();
+	_socket->deleteLater();
 	exit(0);
 }
 
@@ -121,7 +127,6 @@ void ConnectionThread::signup()
 {
 	qDebug()<<"signup";
 
-
 	while (_socket->bytesAvailable() < sizeof(qint32)) {
 		_socket->waitForReadyRead(REFRESH_TIME);
 	}
@@ -146,7 +151,7 @@ void ConnectionThread::signup()
 
 	if (fb.wasError()) {
 		sendError();
-		emit _socket->disconnected();
+		_socket->disconnectFromHost();
 		return;
 	}
 
@@ -179,7 +184,6 @@ void ConnectionThread::userData()
 	id_type user_id;
 	_stream >> user_id;
 	if (user_id == _user->id()) {
-		qDebug() << _user->toString();
 		_stream << *_user;
 	}
 	else {
@@ -207,7 +211,7 @@ void ConnectionThread::delUser()
 	else {
 		sendError();
 	}
-	emit _socket->disconnected();
+	_socket->disconnectFromHost();
 }
 
 void ConnectionThread::friendsList()
