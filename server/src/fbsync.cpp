@@ -81,9 +81,8 @@ void FBsync::fetchUserDataS(QNetworkReply *reply)
 	QJsonDocument jsonResponse = QJsonDocument::fromJson(str.toUtf8());
 	QJsonObject obj = jsonResponse.object();
 	if (obj.find("error") != obj.end()) {
-		qDebug() << "error in fetch userdatas";
 		_wasError = true;
-		//emit error();
+		emit error();
 		return;
 	}
 
@@ -103,9 +102,8 @@ void FBsync::fetchFriendsS(QNetworkReply *reply)
 	QString str = reply->readAll();
 	QJsonDocument jsonResponse = QJsonDocument::fromJson(str.toUtf8());
 	if (jsonResponse.object().find("error") != jsonResponse.object().end()) {
-		qDebug() << "error in fetch friends";
 		_wasError = true;
-		//emit error();
+		emit error();
 		return;
 	}
 

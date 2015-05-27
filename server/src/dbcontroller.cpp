@@ -171,18 +171,23 @@ User *DBController::getUserById(const id_type id)
             query3.exec();
 
             /* making new user and setting all fields */
-            User *u = new User;
-            while (query3.next()){
-					 u->setId(id);
-                u->setEmail(query3.value(1).toString());
-                u->setFirstName(query3.value(2).toString());
-                u->setLastName(query3.value(3).toString());
-                u->setGender(QVariant(query3.value(4)).toString()[0]);
-            }
-            u->setFriends(friends);
-            u->setEventsAttending(eventsAtt);
-            u->setEventsInvited(events);
-            return u;
+				if (query3.size() > 0) {
+					User *u = new User();
+					while (query3.next()){
+						 u->setId(id);
+						 u->setEmail(query3.value(1).toString());
+						 u->setFirstName(query3.value(2).toString());
+						 u->setLastName(query3.value(3).toString());
+						 u->setGender(QVariant(query3.value(4)).toString()[0]);
+					}
+					u->setFriends(friends);
+					u->setEventsAttending(eventsAtt);
+					u->setEventsInvited(events);
+					return u;
+				}
+				else {
+					return nullptr;
+				}
         } else return nullptr;
     } else return nullptr;
 }
@@ -197,7 +202,7 @@ id_type DBController::createEvent(const Event &e)
             QSqlQuery query(db());
             query.prepare("INSERT INTO event (descript, id_founder, title, location, start_date, how_long)"
                             "VALUES (?,?,?,?,?,?)"
-                            "RETURNING e_id");
+									 " RETURNING e_id");
             query.addBindValue(QVariant(e.desc()).toString());
             query.addBindValue(QVariant(e.founder()).toString());
             query.addBindValue(QVariant(e.title()).toString());
@@ -324,20 +329,25 @@ Event *DBController::getEvent(const id_type id)
             QSqlQuery query(db());
             query.prepare("SELECT * FROM event WHERE e_id=" + QVariant(id).toString() + ";");
             query.exec();
-            Event *e =  new Event;
-            while (query.next()){
-                e->setId(id);
-                e->setDesc(query.value(1).toString());
-                e->setFounder(query.value(2).toLongLong());
-                e->setTitle(query.value(3).toString());
-                e->setLocation(query.value(4).toString());
-                e->setDate(QDateTime::fromString(query.value(5).toString(), "yyyy-MM-dd'T'hh:mm:ss"));
-                e->setHow_long(query.value(6).toLongLong());
-            }
-            e->setComments(comments);
-            e->setAttending(attending);
-            e->setInvited(invited);
-            return e;
+				if (query.size() > 0) {
+					Event *e =  new Event;
+					while (query.next()){
+						 e->setId(id);
+						 e->setDesc(query.value(1).toString());
+						 e->setFounder(query.value(2).toLongLong());
+						 e->setTitle(query.value(3).toString());
+						 e->setLocation(query.value(4).toString());
+						 e->setDate(QDateTime::fromString(query.value(5).toString(), "yyyy-MM-dd'T'hh:mm:ss"));
+						 e->setHow_long(query.value(6).toLongLong());
+					}
+					e->setComments(comments);
+					e->setAttending(attending);
+					e->setInvited(invited);
+					return e;
+				}
+				else {
+					return nullptr;
+				}
         } else return nullptr;
     }else return nullptr;
 }
@@ -397,15 +407,20 @@ Comment *DBController::getComment(const id_type id)
             QSqlQuery query(db());
             query.prepare("SELECT * FROM comment WHERE c_id=" + QVariant(id).toString() + ";");
             query.exec();
-            Comment *c =  new Comment;
-            while (query.next()){
-                c->setId(id);
-                c->setEvent(query.value(1).toLongLong());
-                c->setAuthorId(query.value(2).toLongLong());
-                c->setContent(query.value(3).toString());
-                c->setDate(QDateTime::fromString(query.value(4).toString(), "yyyy-MM-dd'T'hh:mm:ss"));
-            }
-            return c;
+				if (query.size() > 0) {
+					Comment *c =  new Comment;
+					while (query.next()){
+						 c->setId(id);
+						 c->setEvent(query.value(1).toLongLong());
+						 c->setAuthorId(query.value(2).toLongLong());
+						 c->setContent(query.value(3).toString());
+						 c->setDate(QDateTime::fromString(query.value(4).toString(), "yyyy-MM-dd'T'hh:mm:ss"));
+					}
+					return c;
+				}
+				else {
+					return nullptr;
+				}
         } else return nullptr;
     }else return nullptr;
 }

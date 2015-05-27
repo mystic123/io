@@ -213,13 +213,9 @@ bool testLogin(const User &u)
 	return true;
 }
 
-bool testSignup(QString token)
+User testSignup(QString token)
 {
-	if (token.compare("0") == 0) {
-		return true;
-	}
-
-	st << MessCodes::signup;
+	//st << MessCodes::signup;
 	st << (qint32) token.size();
 	st << token;
 	socket->waitForBytesWritten();
@@ -233,7 +229,8 @@ bool testSignup(QString token)
 
 	if (c != MessCodes::ok) {
 		qDebug() << "Error. Wrong token?";
-		return false;
+		User u;
+		return u;
 	}
 
 	while (socket->bytesAvailable() < sizeof(id_type)) {
@@ -242,16 +239,14 @@ bool testSignup(QString token)
 	id_type id;
 	st >> id;
 
-
 	st << MessCodes::user_data;
 
 	st << id;
 	socket->flush();
 	User u1 = User::readUser(socket);
 
-	qDebug() << "Fetched data:";
-	qDebug() << u1.toString();
-	return true;
+	qDebug() << "Successfully signed as" << u1.firstName() << u1.lastName();
+	return u1;
 }
 
 bool testCreateUserS(const User &u)
@@ -313,6 +308,25 @@ bool testCreateEvent(Event &e)
 	return (e == e1);
 }
 
+bool testCreateMEvent(Event &e)
+{
+	st << MessCodes::create_event;
+
+	/* setting malformed founder */
+	e.setFounder(1231232413421);
+	st << e;
+
+	while (socket->bytesAvailable() < sizeof(MessCodes)) {
+		socket->waitForReadyRead(REFRESH_TIME);
+	}
+	MessCodes c;
+	st >> c;
+	if (c != MessCodes::error) {
+		return false;
+	}
+	return true;
+}
+
 bool testEventData(const Event &e)
 {
 	st << MessCodes::event_data;
@@ -348,6 +362,36 @@ bool testUpdateEvent(Event& e)
 	Event ne = Event::readEvent(socket);
 
 	return (ne == e);
+}
+
+bool testMEventData()
+{
+	st << MessCodes::event_data;
+
+	id_type id = 123124;
+	st << id;
+	Event e1 = Event::readEvent(socket);
+
+	return (e1.id() == 0);
+}
+
+bool testUpdateMEvent(Event& e)
+{
+	e.setDesc("new desc");
+	e.setFounder(132432412);
+
+	st << MessCodes::update_event;
+
+	st << e;
+
+	while (socket->bytesAvailable() < sizeof(MessCodes)) {
+		socket->waitForReadyRead(REFRESH_TIME);
+	}
+
+	MessCodes code;
+	st >> code;
+
+	return (code == MessCodes::error);
 }
 
 bool testJoinEvent(Event& e, const User& u)
@@ -460,7 +504,7 @@ bool testAddComment(const Comment &c)
 	return (c1 == c);
 }
 
-bool testRemoveUser(const User &u)
+bool testRemoveUserS()
 {
 	st << MessCodes::del_user;
 
@@ -501,7 +545,7 @@ int main(int argc, char *argv[])
 		/* prepare data */
 	 socket = new QTcpSocket();
 	 QString ip = "localhost";
-	 qint16 port = 10666;
+	 qint16 port = 10777;
 	 socket->connectToHost(ip, port);
 	 socket->waitForConnected();
 	 if (socket->state() != QTcpSocket::ConnectedState) {
@@ -511,22 +555,14 @@ int main(int argc, char *argv[])
 
 	 //id_type uid = testSignup();
 
-	 User u1;
-	 u1.setId(123321);
-	 u1.setFirstName("TestName1");
-	 u1.setLastName("TestLastName1");
-	 u1.setEmail("test1@test.com");
-	 u1.setGender('m');
-
 	 User u2;
-	 u2.setId(321123);
-	 u2.setFirstName("TestName2");
-	 u2.setLastName("TestLastName2");
-	 u2.setEmail("test2@test.com");
-	 u2.setGender('f');
+	 u2.setId(123321);
+	 u2.setEmail("mail@mail.com");
+	 u2.setFirstName("first name");
+	 u2.setLastName("last name");
+	 u2.setGender('m');
 
 	 Event e;
-	 e.setFounder(123321);
 	 e.setTitle("event title");
 	 e.setDesc("event desc");
 	 e.setLocation("event location");
@@ -537,30 +573,43 @@ int main(int argc, char *argv[])
 
 	 st.setDevice(socket);
 
-	 qDebug() << "Creating test users...";
-	 qDebug() << "User 1: " << ((testCreateUserS(u1)) ? "OK" : "ERROR!");
-	 qDebug() << "User 2: " << ((testCreateUserS(u2)) ? "OK" : "ERROR!");
-	 testLogin(u1);
-	 qDebug() << "Testing user data: " << ((testUserData(u1)) ? "OK" : "ERROR!");
+	qDebug() << "Signing in:";
+	qDebug() << "Enter token:";
+	string token;
+	cin >> token;
+	User u1 = testSignup(QString::fromStdString(token));
+	if (u1.id() != 0) {
+
+		qDebug() << "Fetched data:";
+		qDebug() << u1.toString();
+		e.setFounder(u1.id());
 	 qDebug() << "Testing create event: " << ((testCreateEvent(e)) ? "OK" : "ERROR!");
 	 qDebug() << "Testing event data: " << ((testEventData(e)) ? "OK" : "ERROR!");
 	 qDebug() << "Testing update event: " << ((testUpdateEvent(e)) ? "OK" : "ERROR!");
+
+	 qDebug() << "Creating other test user...";
+	 qDebug() << "User 2: " << ((testCreateUserS(u2)) ? "OK" : "ERROR!");
+
 	 qDebug() << "Testing add friend: " << ((testAddFriend(u1,u2)) ? "OK" : "ERROR!");
 	 qDebug() << "Testing del friend: " << ((testDelFriend(u1,u2)) ? "OK" : "ERROR!");
 	 testAddFriend(u1,u2);
 
-	 socket->disconnectFromHost();
-	 socket->connectToHost(ip, port);
-	 socket->waitForConnected();
-	 if (socket->state() != QTcpSocket::ConnectedState) {
-		 qDebug() << "Cant connect to server on:" << ip << ":" << port;
-		 return 0;
-	 }
-
 	 testLogin(u2);
 	 qDebug() << "Testing join event: " << ((testJoinEvent(e,u2)) ? "OK" : "ERROR!");
 
-	 qDebug() << "Removing User1: " << ((testRemoveUser(u2)) ? "OK" : "ERROR!");
+	 qDebug() << "Removing User 2: " << ((testRemoveUserS()) ? "OK" : "ERROR!");
+
+	 socket->disconnectFromHost();
+	 socket->readAll();
+	 socket->connectToHost(ip, port);
+	 socket->waitForConnected();
+	 if (socket->state() != QTcpSocket::ConnectedState) {
+		 qDebug() << "Cant connect to server on:" << ip << ":" << port;
+		 return 0;
+	 }
+
+	 u1 = testSignup(QString::fromStdString(token));
+	 qDebug() << "Removing User 1: " << ((testRemoveUserS()) ? "OK" : "ERROR!");
 
 	 socket->disconnectFromHost();
 	 socket->connectToHost(ip, port);
@@ -570,29 +619,13 @@ int main(int argc, char *argv[])
 		 return 0;
 	 }
 
-	 testLogin(u1);
-	 qDebug() << "Removing User2: " << ((testRemoveUser(u1)) ? "OK" : "ERROR!");
+		u1 = testSignup(QString::fromStdString(token));
 
-	 socket->disconnectFromHost();
-	 socket->connectToHost(ip, port);
-	 socket->waitForConnected();
-	 if (socket->state() != QTcpSocket::ConnectedState) {
-		 qDebug() << "Cant connect to server on:" << ip << ":" << port;
-		 return 0;
-	 }
-
-	 qDebug() << "Do you want to test signup? (token needed) [y/n]";
-	string str;
-
-	cin >> str;
-
-	if (str.compare("y") == 0) {
-		qDebug() << "Enter token:";
-		string token;
-		cin >> token;
-		testSignup(QString::fromStdString(token));
+	qDebug() << "Testing creating malformed event: " << ((testCreateMEvent(e)) ? "OK" : "ERROR!");
+	qDebug() << "Testing malformed event data: " << ((testMEventData()) ? "OK" : "ERROR!");
+	qDebug() << "Testing update malformed event: " << ((testUpdateMEvent(e)) ? "OK" : "ERROR!");
+	qDebug() << "Removing User 1: " << ((testRemoveUserS()) ? "OK" : "ERROR!");
 	}
-
 	socket->disconnectFromHost();
 	return 0;
 }

@@ -72,29 +72,29 @@ void ConnectionThread::readyRead()
 {
 	qDebug() << "readyRead";
 
-	/* needs to be added in release
+	/* needs to be added in release */
 	if (!_user) {
 		signup();
 	}
-	*/
+	else {
+		MessCodes m_code;
 
-	MessCodes m_code;
+		_stream >> m_code;
 
-	_stream >> m_code;
+		if (m_code != MessCodes::error)
+			qDebug()<<"m_code: "<<(qint32)m_code;
+		else
+			qDebug()<<"error\n";
 
-	if (m_code != MessCodes::error)
-		qDebug()<<"m_code: "<<(qint32)m_code;
-	else
-		qDebug()<<"error\n";
-
-	auto it = _actions.find(m_code);
-	if (it != _actions.end()) {
-		(this->**it)();
-	}
-	else
-		qDebug()<<"error\n";
-	if (_socket->bytesAvailable() > 0) {
-		this->readyRead();
+		auto it = _actions.find(m_code);
+		if (it != _actions.end()) {
+			(this->**it)();
+		}
+		else
+			qDebug()<<"error\n";
+		if (_socket->bytesAvailable() > 0) {
+			this->readyRead();
+		}
 	}
 }
 
@@ -105,6 +105,7 @@ void ConnectionThread::disconnected()
 	exit(0);
 }
 
+/* for testing, wont be included in release */
 void ConnectionThread::login()
 {
 	qDebug() << "login";
@@ -157,19 +158,24 @@ void ConnectionThread::signup()
 
 	User u = fb.getUser();
 
-  for (auto f : u.friends()) {
-	  if (!_db->getUserById(f)->id()) {
-		  u.delFriend(f);
-	  }
-  }
-
-	_db->createUser(u);
+	_user = _db->getUserById(u.id());
+	id_type id;
+	if (!_user) {
+		for (auto f : u.friends()) {
+			if (!_db->getUserById(f)) {
+				u.delFriend(f);
+			}
+		}
+		_db->createUser(u);
+		id = u.id();
+		_user = _db->getUserById(id);
+	}
+	else {
+		id = _user->id();
+	}
 
 	sendOK();
-
-	id_type id = u.id();
-	_stream << u.id();
-	_user = _db->getUserById(id);
+	_stream << id;
 	_socket->flush();
 }
 
@@ -229,7 +235,13 @@ void ConnectionThread::friendsList()
 	}
 	else {
 		User *u = _db->getUserById(user_id);
-		_stream << u->friends();
+		if (u) {
+			_stream << u->friends();
+		}
+		else {
+			User u;
+			_stream << u.friends();
+		}
 	}
 	_socket->flush();
 }
@@ -245,9 +257,15 @@ void ConnectionThread::eventData()
 	id_type event_id;
 	_stream >> event_id;
 	Event *e = _db->getEvent(event_id);
-	if (!e->id())
-		qDebug() << "ERROR: Event id = 0";
-	_stream << *e;
+	if (e) {
+		if (!e->id())
+			qDebug() << "ERROR: Event id = 0";
+		_stream << *e;
+	}
+	else {
+		Event e;
+		_stream << e;
+	}
 	_socket->flush();
 	delete e;
 }
@@ -258,15 +276,17 @@ void ConnectionThread::createEvent()
 
 	Event e = Event::readEvent(_socket);
 
-
 	QList<id_type> l = _user->friends();
-	//l.prepend(_user->id());
 
 	e.setInvited(l);
 
 	e.addAttendant(_user->id());
 
-	_db->createEvent(e);
+	auto eid = _db->createEvent(e);
+	if (!_db->getEvent(eid)) {
+		sendError();
+		return;
+	}
 	id_type id = _user->id();
 	delete _user;
 	this->_user = _db->getUserById(id);
@@ -278,9 +298,14 @@ void ConnectionThread::updateEvent()
 	qDebug()<<"updateEvent";
 
 	Event e = Event::readEvent(_socket);
-	_db->updateEvent(e);
 
-	sendOK();
+	if (_db->getEvent(e.id())) {
+		_db->updateEvent(e);
+		sendOK();
+	}
+	else {
+		sendError();
+	}
 }
 
 void ConnectionThread::joinEvent()
@@ -296,16 +321,19 @@ void ConnectionThread::joinEvent()
 
 	Event *e = _db->getEvent(id);
 
-	e->addInvited(_user->id());
-	e->addAttendant(_user->id());
-
-	_db->updateEvent(*e);
-
-	delete e;
-	id_type uid = _user->id();
-	delete _user;
-	_user = _db->getUserById(uid);
-	sendOK();
+	if (e) {
+		e->addInvited(_user->id());
+		e->addAttendant(_user->id());
+		_db->updateEvent(*e);
+		delete e;
+		id_type uid = _user->id();
+		delete _user;
+		_user = _db->getUserById(uid);
+		sendOK();
+	}
+	else {
+		sendError();
+	}
 }
 
 void ConnectionThread::addFriend()
@@ -401,8 +429,14 @@ void ConnectionThread::commentData()
 
 	Comment *c = _db->getComment(id);
 
-	_stream << *c;
-	delete c;
+	if (c) {
+		_stream << *c;
+		delete c;
+	}
+	else {
+		Comment c;
+		_stream << c;
+	}
 }
 
 void ConnectionThread::addComment()
@@ -461,10 +495,18 @@ void ConnectionThread::sendOK()
 {
 	_stream << MessCodes::ok;
 	_socket->flush();
+	_socket->waitForBytesWritten();
+	if (_socket->bytesAvailable() > 0) {
+		this->readyRead();
+	}
 }
 
 void ConnectionThread::sendError()
 {
 	_stream << MessCodes::error;
 	_socket->flush();
+	_socket->waitForBytesWritten();
+	if (_socket->bytesAvailable() > 0) {
+		this->readyRead();
+	}
 }
