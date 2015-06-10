@@ -2,6 +2,7 @@
 #define GLOBAL_H
 
 #include <QtGlobal>
+#include <QtCore>
 #include <QDateTime>
 #include <QDebug>
 #include <QDataStream>

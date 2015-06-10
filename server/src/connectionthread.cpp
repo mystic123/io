@@ -29,7 +29,7 @@ const QMap<MessCodes, ConnectionThread::mem_func> ConnectionThread::_actions = {
 	{MessCodes::del_user, &ConnectionThread::delUser}
 };
 
-ConnectionThread::ConnectionThread(qintptr ID, QObject *parent) : QThread(parent), _socket_desc(ID), _stream(), _user(nullptr), _db(new DBController(ID))
+ConnectionThread::ConnectionThread(Server *parent, int id, QWaitCondition& wait) : QThread(parent), _parent(parent), _id(id), _stream(), _user(nullptr), _db(new DBController(_id)), _mtx(),_wait(wait)
 {
 }
 
@@ -49,6 +49,17 @@ void ConnectionThread::run()
 
 	this->setAutoDelete(false);
 
+	_mtx.lock();
+	_wait.wait(&_mtx);
+	qintptr id = _parent->nextClient();
+	_socket_desc = id;
+	handleConnection();
+
+	exec();
+}
+
+void ConnectionThread::handleConnection()
+{
 	_socket = new QTcpSocket();
 
 	_stream.setDevice(_socket);
@@ -59,13 +70,11 @@ void ConnectionThread::run()
 	}
 
 	connect(this->_socket, SIGNAL(readyRead()), this, SLOT(readyRead()), Qt::DirectConnection);
-	connect(this->_socket, SIGNAL(disconnected()), this, SLOT(disconnected()));
+	connect(this->_socket, SIGNAL(disconnected()), this, SLOT(disconnected()), Qt::DirectConnection);
 
 	qDebug()<<_socket_desc<<"Client connected\n";
 
 	qDebug()<<_socket->peerName()<<" "<<_socket->peerAddress()<<" "<<_socket->peerPort()<<endl;
-
-		exec();
 }
 
 void ConnectionThread::readyRead()
@@ -101,8 +110,16 @@ void ConnectionThread::readyRead()
 void ConnectionThread::disconnected()
 {
 	qDebug()<<_socket_desc<<"Disconnected";
+
 	_socket->deleteLater();
-	exit(0);
+	_socket = 0;
+
+	if (!_parent->clientWaiting()) {
+		_mtx.lock();
+		_wait.wait(&_mtx);
+	}
+	_socket_desc = _parent->nextClient();
+	handleConnection();
 }
 
 /* for testing, wont be included in release */
@@ -402,17 +419,17 @@ void ConnectionThread::fbFriendsList()
 	QList<id_type> user_list = _user->friends();
 
 	QSet<id_type> fb_set = QSet<id_type>::fromList(fb_list);
-    QSet<id_type> fb_set_tmp = QSet<id_type>::fromList(fb_list);
+	QSet<id_type> fb_set_tmp = QSet<id_type>::fromList(fb_list);
 	QSet<id_type> user_set = QSet<id_type>::fromList(user_list);
-    QSet<id_type> intersect = fb_set_tmp.intersect(user_set);
-    fb_set.subtract(intersect);
+	QSet<id_type> intersect = fb_set_tmp.intersect(user_set);
+	fb_set.subtract(intersect);
 
-    auto fb_list_r = fb_set.toList();
+	auto fb_list_r = fb_set.toList();
 
-    _stream << fb_list_r.size();
-    _socket->waitForBytesWritten();
-    _stream << fb_set.toList();
-	 _socket->flush();
+	_stream << fb_list_r.size();
+	_socket->waitForBytesWritten();
+	_stream << fb_set.toList();
+	_socket->flush();
 }
 
 void ConnectionThread::commentData()

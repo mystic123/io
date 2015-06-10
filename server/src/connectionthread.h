@@ -16,7 +16,7 @@ class ConnectionThread : public QThread, public QRunnable
 	Q_OBJECT
 
 public:
-	explicit ConnectionThread(qintptr ID, QObject *parent = 0);
+	explicit ConnectionThread(Server *parent, int id, QWaitCondition& wait);
 	virtual ~ConnectionThread();
 	void run();
 
@@ -32,6 +32,9 @@ public slots:
 private:
 	typedef void (ConnectionThread::*mem_func)();
 	static const QMap<MessCodes, mem_func> _actions;
+
+	void handleConnection();
+
 	void login();
 	void userData();
 	void delUser();
@@ -55,11 +58,16 @@ private:
 	void sendOK();
 	void sendError();
 
+	Server* _parent;
+	const int _id;
 	QTcpSocket *_socket;
 	qintptr _socket_desc;
 	QDataStream _stream;
 	User* _user;
 	DBController *_db;
+
+	QMutex _mtx;
+	QWaitCondition& _wait;
 
 };
 

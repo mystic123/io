@@ -2,7 +2,9 @@
 #include "connectionthread.h"
 #include <QHostAddress>
 
-Server::Server(QObject *parent): QTcpServer(parent)
+const int Server::threadCount = QThread::idealThreadCount();
+
+Server::Server(QObject *parent): QTcpServer(parent), threads(), queue_mutex(), connection_waiting(), waiting_connections()
 {
 }
 
@@ -20,16 +22,39 @@ void Server::startServer()
 		qDebug()<<"Listening to port: "<<port<<endl;
 	}
 
+	for (int i = 0; i < threadCount; i++) {
+		ConnectionThread *t = new ConnectionThread(this, i, connection_waiting);
+		threads.push_back(t);
+		connect(t, SIGNAL(finished()), t, SLOT(deleteLater()));
+		t->start();
+	}
 }
 
 void Server::incomingConnection(qintptr socket_desc)
 {
 	qDebug()<<socket_desc<<"Connecting...\n";
 
-	ConnectionThread *thread = new ConnectionThread(socket_desc, this);
+	queue_mutex.lock();
+	waiting_connections.push_back(socket_desc);
+	queue_mutex.unlock();
 
-	connect(thread, SIGNAL(finished()), thread, SLOT(deleteLater()));
+	connection_waiting.wakeOne();
+}
 
-	//QThreadPool::globalInstance()->start(thread);
-	thread->start();
+qintptr Server::nextClient()
+{
+	qintptr result;
+	queue_mutex.lock();
+	result = waiting_connections.takeFirst();
+	queue_mutex.unlock();
+	return result;
+}
+
+bool Server::clientWaiting()
+{
+	bool result;
+	queue_mutex.lock();
+	result = waiting_connections.empty();
+	queue_mutex.unlock();
+	return !result;
 }
